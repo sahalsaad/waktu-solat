@@ -4,6 +4,7 @@ ion-item {
 }
 
 ion-label {
+  padding-left: 12px;
   margin-top: 12px;
   margin-bottom: 12px;
 }
@@ -38,6 +39,10 @@ ion-item ion-note {
 
 ion-item ion-note.md {
   margin-right: 14px;
+}
+
+h1 {
+  text-transform: capitalize;
 }
 
 .dot {
