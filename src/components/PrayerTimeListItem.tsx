@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
+import React, { useEffect, useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { PrayerTime } from '../data/prayer-time';
 
 interface PrayerTimeListItemProps {
@@ -8,41 +8,23 @@ interface PrayerTimeListItemProps {
   index: number;
 }
 
-const { width } = Dimensions.get('window');
-
 const PrayerTimeListItem: React.FC<PrayerTimeListItemProps> = ({ 
   prayerTime, 
   isNext = false, 
   index 
 }) => {
-  const slideAnim = useRef(new Animated.Value(50)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        delay: index * 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 600,
-        delay: index * 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 600,
-        delay: index * 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      delay: index * 100,
+      useNativeDriver: true,
+    }).start();
   }, []);
 
-  const getPrayerIcon = (name: string): string => {
+  const getPrayerIcon = useCallback((name: string): string => {
     const icons: { [key: string]: string } = {
       'Fajr': '🌅',
       'Dhuhr': '☀️',
@@ -51,17 +33,17 @@ const PrayerTimeListItem: React.FC<PrayerTimeListItemProps> = ({
       'Isha': '🌙'
     };
     return icons[name] || '🕌';
-  };
+  }, []);
 
-  const formatTime = (time: Date): string => {
+  const formatTime = useCallback((time: Date): string => {
     return time.toLocaleString("en-US", {
       hour: "numeric",
       minute: "2-digit",
       hour12: true
     });
-  };
+  }, []);
 
-  const getTimeUntil = (time: Date): string => {
+  const getTimeUntil = useCallback((time: Date): string => {
     const now = new Date();
     const prayerTime = new Date();
     prayerTime.setHours(time.getHours(), time.getMinutes(), 0, 0);
@@ -80,20 +62,14 @@ const PrayerTimeListItem: React.FC<PrayerTimeListItemProps> = ({
     } else {
       return 'now';
     }
-  };
+  }, []);
 
   return (
     <Animated.View 
       style={[
         styles.container,
         isNext && styles.nextPrayerContainer,
-        {
-          transform: [
-            { translateX: slideAnim },
-            { scale: scaleAnim }
-          ],
-          opacity: opacityAnim,
-        }
+        { opacity: fadeAnim }
       ]}
     >
       <View style={styles.content}>
@@ -136,10 +112,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },

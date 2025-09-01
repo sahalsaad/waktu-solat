@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -7,9 +7,7 @@ import {
   ScrollView, 
   RefreshControl, 
   Alert,
-  Dimensions,
   Animated,
-  Platform
 } from 'react-native';
 import { SafeAreaView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
@@ -19,8 +17,6 @@ import NextPrayerCard from './src/components/NextPrayerCard';
 import ZoneSelector from './src/components/ZoneSelector';
 import DateCard from './src/components/DateCard';
 import { PrayerTime, ExtendedPrayerData } from './src/data/prayer-time';
-
-const { width, height } = Dimensions.get('window');
 
 export default function App() {
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
@@ -89,7 +85,7 @@ export default function App() {
     }
   };
 
-  const formatPrayerName = (name: string): string => {
+  const formatPrayerName = useCallback((name: string): string => {
     const nameMap: { [key: string]: string } = {
       'subuh': 'Fajr',
       'zohor': 'Dhuhr',
@@ -98,9 +94,9 @@ export default function App() {
       'isyak': 'Isha'
     };
     return nameMap[name.toLowerCase()] || name.charAt(0).toUpperCase() + name.slice(1);
-  };
+  }, []);
 
-  const updateNextPrayer = (times: PrayerTime[] = prayerTimes) => {
+  const updateNextPrayer = useCallback((times: PrayerTime[] = prayerTimes) => {
     if (times.length === 0) return;
 
     const now = new Date();
@@ -114,23 +110,23 @@ export default function App() {
       }
     }
     
-    // If no prayer is found for today, next prayer is tomorrow's first prayer
     setNextPrayer(times[0]);
-  };
+  }, [prayerTimes]);
 
-  const onRefresh = async () => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await fetchData(zone);
     setRefreshing(false);
-  };
+  }, [zone]);
 
-  const handleZoneChange = (newZone: string) => {
+  const handleZoneChange = useCallback((newZone: string) => {
     setZone(newZone);
-  };
+  }, []);
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" backgroundColor="#1a1f2e" />
+      <StatusBar style="light" />
+      <View style={styles.statusBarBackground} />
       <SafeAreaView style={styles.safeArea}>
         <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
           <Header />
@@ -190,6 +186,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1a1f2e',
+  },
+  statusBarBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 50, // Adjust based on your status bar height
+    backgroundColor: '#1a1f2e',
+    zIndex: -1,
   },
   safeArea: {
     flex: 1,

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { PrayerTime } from '../data/prayer-time';
 
 interface NextPrayerCardProps {
@@ -7,27 +7,17 @@ interface NextPrayerCardProps {
   loading: boolean;
 }
 
-const { width } = Dimensions.get('window');
-
 const NextPrayerCard: React.FC<NextPrayerCardProps> = ({ nextPrayer, loading }) => {
   const [timeRemaining, setTimeRemaining] = useState<string>('');
-  const scaleAnim = useRef(new Animated.Value(0.9)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
 
     // Pulse animation for the next prayer indicator
     const pulseAnimation = Animated.loop(
@@ -86,18 +76,7 @@ const NextPrayerCard: React.FC<NextPrayerCardProps> = ({ nextPrayer, loading }) 
     return () => clearInterval(interval);
   }, [nextPrayer]);
 
-  if (loading || !nextPrayer) {
-    return (
-      <View style={[styles.container, styles.loadingContainer]}>
-        <View style={styles.loadingContent}>
-          <View style={styles.loadingBar} />
-          <Text style={styles.loadingText}>Loading next prayer...</Text>
-        </View>
-      </View>
-    );
-  }
-
-  const getPrayerIcon = (name: string): string => {
+  const getPrayerIcon = useCallback((name: string): string => {
     const icons: { [key: string]: string } = {
       'Fajr': '🌅',
       'Dhuhr': '☀️',
@@ -106,24 +85,33 @@ const NextPrayerCard: React.FC<NextPrayerCardProps> = ({ nextPrayer, loading }) 
       'Isha': '🌙'
     };
     return icons[name] || '🕌';
-  };
+  }, []);
 
-  const formatTime = (time: Date): string => {
+  const formatTime = useCallback((time: Date): string => {
     return time.toLocaleString("en-US", {
       hour: "numeric",
       minute: "2-digit",
       hour12: true
     });
-  };
+  }, []);
+
+  // Conditional rendering AFTER all hooks
+  if (loading || !nextPrayer) {
+    return (
+      <Animated.View style={[styles.container, styles.loadingContainer, { opacity: fadeAnim }]}>
+        <View style={styles.loadingContent}>
+          <View style={styles.loadingBar} />
+          <Text style={styles.loadingText}>Loading next prayer...</Text>
+        </View>
+      </Animated.View>
+    );
+  }
 
   return (
     <Animated.View 
       style={[
         styles.container,
-        {
-          transform: [{ scale: scaleAnim }],
-          opacity: opacityAnim,
-        }
+        { opacity: fadeAnim }
       ]}
     >
       <View style={styles.header}>
@@ -171,10 +159,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     elevation: 6,
     shadowColor: '#64b5f6',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     borderWidth: 1,
@@ -253,10 +238,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
@@ -306,7 +288,7 @@ const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
     backgroundColor: '#64b5f6',
-    width: '70%', // This would be dynamic based on time remaining
+    width: '70%',
   },
 });
 

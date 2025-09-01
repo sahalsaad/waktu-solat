@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -18,7 +18,7 @@ interface ZoneSelectorProps {
   loading: boolean;
 }
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 const ZoneSelector: React.FC<ZoneSelectorProps> = ({ 
   selectedZone, 
@@ -39,16 +39,15 @@ const ZoneSelector: React.FC<ZoneSelectorProps> = ({
     setFilteredZones(filtered);
   }, [searchQuery]);
 
-  const getSelectedZoneInfo = (): ZoneInfo | undefined => {
+  const getSelectedZoneInfo = useCallback((): ZoneInfo | undefined => {
     return MALAYSIA_ZONES.find(zone => zone.code === selectedZone);
-  };
+  }, [selectedZone]);
 
-  const handleZoneSelect = (zone: ZoneInfo) => {
+  const handleZoneSelect = useCallback((zone: ZoneInfo) => {
     onZoneChange(zone.code);
     setModalVisible(false);
     setSearchQuery('');
     
-    // Animate button press
     Animated.sequence([
       Animated.timing(scaleAnim, {
         toValue: 0.95,
@@ -61,9 +60,9 @@ const ZoneSelector: React.FC<ZoneSelectorProps> = ({
         useNativeDriver: true,
       }),
     ]).start();
-  };
+  }, [onZoneChange, scaleAnim]);
 
-  const renderZoneItem = ({ item }: { item: ZoneInfo }) => (
+  const renderZoneItem = useCallback(({ item }: { item: ZoneInfo }) => (
     <Pressable
       style={({ pressed }) => [
         styles.zoneItem,
@@ -100,7 +99,7 @@ const ZoneSelector: React.FC<ZoneSelectorProps> = ({
         </View>
       )}
     </Pressable>
-  );
+  ), [selectedZone, handleZoneSelect]);
 
   const selectedZoneInfo = getSelectedZoneInfo();
 
@@ -200,10 +199,7 @@ const styles = StyleSheet.create({
     padding: 16,
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     borderWidth: 1,

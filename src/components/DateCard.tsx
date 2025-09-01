@@ -1,31 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { ExtendedPrayerData } from '../data/prayer-time';
 
 interface DateCardProps {
   extendedData: ExtendedPrayerData | null;
 }
 
-const { width } = Dimensions.get('window');
-
 const DateCard: React.FC<DateCardProps> = ({ extendedData }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const slideAnim = useRef(new Animated.Value(100)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
 
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -34,29 +24,28 @@ const DateCard: React.FC<DateCardProps> = ({ extendedData }) => {
     return () => clearInterval(timer);
   }, []);
 
-  const formatCurrentTime = (): string => {
+  const formatCurrentTime = useCallback((): string => {
     return currentTime.toLocaleString("en-US", {
       hour: "numeric",
       minute: "2-digit",
       second: "2-digit",
       hour12: true
     });
-  };
+  }, [currentTime]);
 
-  const formatCurrentDate = (): string => {
+  const formatCurrentDate = useCallback((): string => {
     return currentTime.toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric"
     });
-  };
+  }, [currentTime]);
 
-  const formatHijriDate = (hijri: string): string => {
+  const formatHijriDate = useCallback((hijri: string): string => {
     if (!hijri) return '';
-    // Format the Hijri date to be more readable
     return hijri.replace(/(\d+)-(\d+)-(\d+)/, '$3 Hijri $2, $1 AH');
-  };
+  }, []);
 
   if (!extendedData) {
     return (
@@ -73,10 +62,7 @@ const DateCard: React.FC<DateCardProps> = ({ extendedData }) => {
     <Animated.View 
       style={[
         styles.container,
-        {
-          transform: [{ translateY: slideAnim }],
-          opacity: opacityAnim,
-        }
+        { opacity: fadeAnim }
       ]}
     >
       <View style={styles.header}>
@@ -127,10 +113,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     elevation: 3,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
   },
