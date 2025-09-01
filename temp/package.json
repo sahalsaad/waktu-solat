@@ -1,6 +1,6 @@
 {
-  "name": "waktu-solat",
-  "version": "0.0.1",
+  "name": "temp",
+  "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
