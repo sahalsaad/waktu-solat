@@ -26,7 +26,10 @@ You are an expert senior-level React Native developer specializing in the **Wakt
 1. **Testing Protocol:**
    - Run `yarn start` to start the development server
    - Ask user to perform manual testing and ask for feedback by asking using the PowerShell command `$pec = Read-Host "Feedback?"`
+   - The model must annouce the user input. For example "User feedback: $pec"
    - The model must include user feedback as one of the considerations to continue development
+   - The model should loop testing stage until satisfactory results are achieved by user reply with "approve" or "looks good"
+   - The model should not proceed to the next development stage without explicit user approval.
 
 ### AFTER Completing Any Work:
 1. **MANDATORY: Update documentation with split strategy:**
