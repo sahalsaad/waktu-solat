@@ -1,5 +1,4 @@
-import React from 'react'
-import { Card, Text, XStack, YStack, Circle, LinearGradient } from 'tamagui'
+import { Card, Text, XStack, YStack, Circle } from 'tamagui'
 
 interface NextPrayerCountdownProps {
   nextPrayer: string
@@ -49,7 +48,6 @@ export function NextPrayerCountdown({ nextPrayer, timeLeft, currentPrayer }: Nex
               fontSize="$6"
               fontWeight="600"
               color="$archText"
-              fontFamily="$mono"
             >
               {timeLeft}
             </Text>

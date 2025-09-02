@@ -62,7 +62,6 @@ export function PrayerTimeCard({ prayer, time, isNext, isCurrent, isAdditional =
           fontSize="$6"
           fontWeight="bold"
           color={isNext ? '$archPrimary' : '$archText'}
-          fontFamily="$mono"
         >
           {formatTime(time)}
         </Text>

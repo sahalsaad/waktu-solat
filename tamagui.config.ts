@@ -106,6 +106,10 @@ export const config = createTamagui({
   tokens: customTokens,
   themes: customThemes,
   defaultTheme: 'dark',
+  settings: {
+    ...defaultConfig.settings,
+    onlyAllowShorthands: false
+  }
 })
 
 export default config

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Card, Text, XStack, YStack } from 'tamagui'
 import { Calendar, MapPin } from '@tamagui/lucide-icons'
 import { formatHijriDate, formatGregorianDate } from '../../utils/prayerUtils'

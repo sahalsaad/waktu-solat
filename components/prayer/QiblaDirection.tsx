@@ -1,4 +1,3 @@
-import React from 'react'
 import { Card, Text, XStack, YStack, Circle } from 'tamagui'
 import { Compass, Navigation } from '@tamagui/lucide-icons'
 import { PrayerTimeService } from '../../services/prayerService'
