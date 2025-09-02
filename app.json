@@ -1,0 +1,57 @@
+{
+  "expo": {
+    "name": "Waktu Solat Malaysia",
+    "slug": "waktu-solat-malaysia",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "waktusolat",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0d1117"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.waktusolat.malaysia"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#0d1117"
+      },
+      "package": "com.waktusolat.malaysia"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "newArchEnabled": true
+          },
+          "android": {
+            "newArchEnabled": true
+          }
+        }
+      ],
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "description": "Aplikasi waktu solat rasmi untuk Malaysia dengan data dari JAKIM. Dapatkan maklumat waktu solat yang tepat mengikut zon di seluruh Malaysia.",
+    "keywords": ["prayer", "solat", "islam", "malaysia", "jakim", "waktu", "kiblat", "qibla"],
+    "primaryColor": "#1793d1"
+  }
+}
