@@ -7,6 +7,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font'
 import { SplashScreen, Stack } from 'expo-router'
 import { Provider } from 'components/Provider'
+import { PrayerPreferencesProvider } from '../contexts/PrayerPreferencesContext'
 import { useTheme } from 'tamagui'
 
 export {
@@ -47,7 +48,13 @@ export default function RootLayout() {
 }
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
-  return <Provider>{children}</Provider>
+  return (
+    <Provider>
+      <PrayerPreferencesProvider>
+        {children}
+      </PrayerPreferencesProvider>
+    </Provider>
+  )
 }
 
 function RootLayoutNav() {

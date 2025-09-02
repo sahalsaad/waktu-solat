@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { YStack, XStack, Text, Switch, Card, Button, Sheet, H2 } from 'tamagui'
 import { Bell, Volume2, Smartphone, Clock, Info, Moon, X } from '@tamagui/lucide-icons'
+import { usePrayerPreferences } from '../../contexts/PrayerPreferencesContext'
 
 interface SettingItem {
   icon: React.ReactNode
@@ -17,39 +18,46 @@ interface SettingsSheetProps {
 }
 
 export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
-  const [notifications, setNotifications] = useState(true)
-  const [sound, setSound] = useState(true)
-  const [vibration, setVibration] = useState(true)
-  const [reminderBefore, setReminderBefore] = useState(true)
+  const { preferences, updatePreferences } = usePrayerPreferences()
 
-  const settings: SettingItem[] = [
+  const notificationSettings: SettingItem[] = [
     {
       icon: <Bell color="#1793d1" size={20} />,
       title: 'Notifikasi Waktu Solat',
       description: 'Terima pemberitahuan ketika masuk waktu solat',
-      value: notifications,
-      onToggle: setNotifications,
+      value: preferences.notifications,
+      onToggle: (value) => updatePreferences({ notifications: value }),
+    },
+    {
+      icon: <Clock color="#f78166" size={20} />,
+      title: 'Peringatan Awal',
+      description: 'Notifikasi 15 minit sebelum waktu solat',
+      value: preferences.earlyNotification,
+      onToggle: (value) => updatePreferences({ earlyNotification: value }),
+    },
+  ]
+
+  const prayerDisplaySettings: SettingItem[] = [
+    {
+      icon: <Moon color="#ffd700" size={20} />,
+      title: 'Tampilkan Imsak',
+      description: 'Paparkan waktu Imsak dalam senarai',
+      value: preferences.showImsak,
+      onToggle: (value) => updatePreferences({ showImsak: value }),
     },
     {
       icon: <Volume2 color="#f78166" size={20} />,
-      title: 'Bunyi Azan',
-      description: 'Mainkan azan ketika masuk waktu solat',
-      value: sound,
-      onToggle: setSound,
+      title: 'Tampilkan Syuruk',
+      description: 'Paparkan waktu Syuruk dalam senarai',
+      value: preferences.showSyuruk,
+      onToggle: (value) => updatePreferences({ showSyuruk: value }),
     },
     {
-      icon: <Smartphone color="#f78166" size={20} />,
-      title: 'Getaran',
-      description: 'Bergetar ketika menerima notifikasi',
-      value: vibration,
-      onToggle: setVibration,
-    },
-    {
-      icon: <Clock color="#ffd700" size={20} />,
-      title: 'Peringatan Awal',
-      description: 'Notifikasi 15 minit sebelum waktu solat',
-      value: reminderBefore,
-      onToggle: setReminderBefore,
+      icon: <Smartphone color="#1793d1" size={20} />,
+      title: 'Tampilkan Dhuha',
+      description: 'Paparkan waktu Dhuha dalam senarai',
+      value: preferences.showDhuha,
+      onToggle: (value) => updatePreferences({ showDhuha: value }),
     },
   ]
 
@@ -160,7 +168,31 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
                   Notifikasi
                 </Text>
                 
-                {settings.map((setting, index) => (
+                {notificationSettings.map((setting, index) => (
+                  <SettingCard key={index} {...setting} />
+                ))}
+              </YStack>
+
+              {/* Prayer Display Settings */}
+              <YStack gap="$3" marginTop="$4">
+                <Text
+                  fontSize="$4"
+                  fontWeight="600"
+                  color="#f78166"
+                  marginBottom="$2"
+                >
+                  Waktu Solat Tambahan
+                </Text>
+                <Text
+                  fontSize="$3"
+                  color="#8b949e"
+                  marginBottom="$2"
+                  lineHeight={18}
+                >
+                  Pilih waktu solat tambahan yang ingin dipaparkan. Waktu solat utama (Subuh, Zohor, Asar, Maghrib, Isyak) akan sentiasa ditunjukkan.
+                </Text>
+                
+                {prayerDisplaySettings.map((setting, index) => (
                   <SettingCard key={index} {...setting} />
                 ))}
               </YStack>

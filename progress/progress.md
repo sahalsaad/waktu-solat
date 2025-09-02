@@ -7,7 +7,136 @@
 **Primary Language:** TypeScript  
 **Target:** Malaysian Islamic Prayer Times Application
 
-## Recent Session Accomplishments
+## Current Session Accomplishments
+
+### 🎯 **Main Task Completed: Settings Cleanup & Optional Prayer Time Toggles**
+
+#### Problem Identified:
+- Settings contained unknown/unused features (Azan sound, Vibration)
+- User wanted simplified settings focused on essential features
+- No way to customize which optional prayer times to display
+- All prayer times were always shown regardless of user preference
+
+#### Solution Implemented:
+
+1. **Cleaned Up Settings Interface**
+   - **Removed:** Azan sound and vibration settings (unclear functionality)
+   - **Kept:** Essential notification and early notification settings
+   - **Added:** New section for optional prayer time visibility toggles
+   - **Improved:** Better categorization and visual separation
+
+2. **Created Prayer Preferences Context**
+   - File: `contexts/PrayerPreferencesContext.tsx`
+   - Features:
+     - Persistent storage using AsyncStorage
+     - Context-based state management
+     - Default preferences initialization
+     - Type-safe preference updates
+   - Settings stored:
+     - `notifications`: Master notification toggle
+     - `earlyNotification`: 15-minute early warning toggle
+     - `showImsak`: Toggle Imsak prayer visibility
+     - `showSyuruk`: Toggle Syuruk prayer visibility
+     - `showDhuha`: Toggle Dhuha prayer visibility
+
+3. **Enhanced Settings Sheet Component**
+   - File: `components/prayer/SettingsSheet.tsx`
+   - **Two Settings Sections:**
+     - **Notifikasi**: Notification preferences (blue theme)
+     - **Waktu Solat Tambahan**: Optional prayer toggles (coral theme)
+   - **Clear User Guidance**: Explanatory text about main vs optional prayers
+   - **Integrated Storage**: Connected to PrayerPreferencesContext
+   - **Maintained Design**: Consistent Arch Linux dark theme
+
+4. **Implemented Conditional Prayer Display**
+   - File: `app/index.tsx`
+   - **Always Visible**: Main prayer times (Subuh, Zohor, Asar, Maghrib, Isyak)
+   - **User Controllable**: Optional prayers (Imsak, Syuruk, Dhuha)
+   - **Maintained Order**: Prayers display in correct API sequence when visible
+   - **Preserved Functionality**: Next/current prayer highlighting works regardless
+
+5. **Added Dependency Management**
+   - Installed: `@react-native-async-storage/async-storage@2.2.0`
+   - Integrated: PrayerPreferencesProvider in app layout
+   - **Storage Structure**: JSON preferences persisted locally
+
+## Technical Implementation Details
+
+### 🏗 **Architecture Updates**
+
+**New Context System:**
+```typescript
+interface PrayerPreferences {
+  // Notification settings
+  notifications: boolean
+  earlyNotification: boolean
+  
+  // Optional prayer time visibility
+  showImsak: boolean
+  showSyuruk: boolean
+  showDhuha: boolean
+}
+```
+
+**Conditional Rendering Pattern:**
+```tsx
+{preferences.showImsak && (
+  <PrayerTimeCard
+    prayer={{ key: 'imsak', name: 'Imsak', nameArabic: 'إمساك' }}
+    time={todayPrayer.imsak}
+    isAdditional={true}
+  />
+)}
+```
+
+### 📱 **User Experience Improvements**
+
+**Settings Simplification:**
+- ✅ **Before:** 4 unclear settings (notifications, azan, vibration, early warning)
+- ✅ **After:** 2 clear notification settings + 3 prayer visibility toggles
+- ✅ **Benefit:** Users understand what each setting does
+
+**Prayer Time Customization:**
+- ✅ **Main Prayers:** Always visible (cannot be disabled)
+- ✅ **Optional Prayers:** User-controllable visibility
+- ✅ **Preserved Logic:** Next/current prayer calculations work correctly
+- ✅ **Visual Consistency:** Border colors and styling maintained
+
+**Storage & Performance:**
+- ✅ **Persistent Preferences:** Settings survive app restarts
+- ✅ **Optimized Rendering:** Only visible prayers are rendered
+- ✅ **Fast Access:** Context-based state management
+- ✅ **Error Handling:** Graceful fallbacks for storage issues
+
+### 🎨 **UI/UX Design Updates**
+
+**Settings Sheet Reorganization:**
+```
+┌─ Notifikasi (Blue Theme) ─────────────┐
+│ ✓ Notifikasi Waktu Solat             │
+│ ✓ Peringatan Awal                    │
+└───────────────────────────────────────┘
+
+┌─ Waktu Solat Tambahan (Coral Theme) ─┐
+│ ⚡ Clear explanation about main vs    │
+│    optional prayers                   │
+│ ✓ Tampilkan Imsak                    │
+│ ✓ Tampilkan Syuruk                   │
+│ ✓ Tampilkan Dhuha                    │
+└───────────────────────────────────────┘
+```
+
+**Prayer Display Logic:**
+- **Imsak:** Conditional (default: visible)
+- **Subuh:** Always visible ⚡ 
+- **Syuruk:** Conditional (default: visible)
+- **Dhuha:** Conditional (default: visible)
+- **Zohor:** Always visible ⚡
+- **Asar:** Always visible ⚡
+- **Maghrib:** Always visible ⚡
+- **Isyak:** Always visible ⚡
+
+## Previous Session Accomplishments
 
 ### 🎯 **Main Task Completed: UI Architecture Redesign - Tab to Header/Sheet Layout**
 
@@ -103,9 +232,10 @@
 - **Framework:** React Native + Expo 53.x
 - **UI Library:** Tamagui v4 with custom theming
 - **Navigation:** Expo Router v5
-- **State Management:** React useState/useEffect
+- **State Management:** React Context + AsyncStorage for preferences
 - **API Service:** Custom prayer time service
 - **Icons:** Lucide React Native icons
+- **Storage:** AsyncStorage for persistent user preferences
 
 ### 🎨 **Design System Updates**
 **Theme Configuration** (`tamagui.config.ts`):
@@ -135,20 +265,23 @@
 ### 📁 **Updated Project Structure**
 ```
 app/
-├── index.tsx             # MOVED: Main prayer times screen (from (tabs)/index.tsx)
-├── _layout.tsx           # UPDATED: Simple stack navigation (removed tabs)
+├── index.tsx             # Main prayer times screen with conditional rendering
+├── _layout.tsx           # Stack navigation with PrayerPreferencesProvider
 ├── modal.tsx            # Existing modal screens
 └── +not-found.tsx       # 404 page
 
 components/
 ├── prayer/
-│   ├── SettingsSheet.tsx     # NEW: Modal sheet for settings
-│   ├── CombinedHeader.tsx     # Combined date + countdown
-│   ├── PrayerTimeCard.tsx     # Enhanced with isAdditional prop
-│   ├── QiblaDirection.tsx     # Qibla compass
-│   └── ZoneSelector.tsx       # Location selector
+│   ├── SettingsSheet.tsx     # Enhanced settings with prayer toggles
+│   ├── CombinedHeader.tsx    # Combined date + countdown
+│   ├── PrayerTimeCard.tsx    # Enhanced with isAdditional prop
+│   ├── QiblaDirection.tsx    # Qibla compass
+│   └── ZoneSelector.tsx      # Location selector
 ├── Provider.tsx         # App providers
 └── CurrentToast.tsx     # Toast notifications
+
+contexts/
+└── PrayerPreferencesContext.tsx  # NEW: Prayer preferences management
 
 services/
 └── prayerService.ts     # API integration
@@ -254,11 +387,12 @@ const formatGregorianDate = (dateString: string): string => {
 4. **Performance:** Optimize re-renders during countdown updates
 
 ### 🎯 **Feature Enhancements**
-1. **Notifications:** Add prayer time reminders
-2. **Customization:** Allow users to toggle additional prayers visibility
+1. **Notifications:** Implement actual prayer time reminders (currently UI-only)
+2. **Audio:** Add Adhan (call to prayer) audio support
 3. **Themes:** Add light mode support
 4. **Offline Mode:** Cache prayer times for offline viewing
-5. **Audio:** Add Adhan (call to prayer) audio support
+5. **Advanced Customization:** Add prayer time adjustment settings
+6. **Widgets:** Home screen widget support
 
 ### 🔧 **Technical Debt**
 1. Replace hardcoded colors with consistent theme tokens
@@ -273,6 +407,7 @@ const formatGregorianDate = (dateString: string): string => {
 - React Native: 0.79.2 (needs update to 0.79.5)
 - Tamagui: v4 (latest)
 - Expo Router: ~5.0.5 (needs update to 5.1.5)
+- AsyncStorage: 2.2.0 ✅ (newly added)
 
 ### 🛠 **Build Status**
 - **Metro Bundler:** ✅ Working
@@ -292,6 +427,10 @@ const formatGregorianDate = (dateString: string): string => {
 - ✅ Pull-to-refresh functionality
 - ✅ Auto-update countdown every minute
 - ✅ Combined header shows all information compactly
+- ✅ **NEW:** Optional prayer time toggles work correctly
+- ✅ **NEW:** Settings persist across app restarts
+- ✅ **NEW:** Conditional prayer rendering maintains order
+- ✅ **NEW:** Main prayers always visible, optional prayers user-controlled
 
 ### 🎯 **UI/UX Validation**
 - **Space Efficiency:** Significant improvement achieved
@@ -303,19 +442,19 @@ const formatGregorianDate = (dateString: string): string => {
 
 ## Session Summary
 
-**Duration:** ~1 hour  
-**Primary Focus:** UI architecture redesign from tab navigation to header/sheet layout  
-**Result:** Successfully transformed the app from a tab-based navigation to a single-screen interface with a custom header containing centered title and settings button. Settings now appear in a modern modal sheet instead of a separate tab, providing better focus on prayer times while maintaining full settings functionality.
+**Duration:** ~45 minutes  
+**Primary Focus:** Settings cleanup and optional prayer time toggle implementation  
+**Result:** Successfully cleaned up settings interface by removing unclear features and added user-controllable visibility toggles for optional prayer times. Implemented persistent storage system for preferences while maintaining all existing functionality.
 
 **User Experience Improvements:**
-- ✅ Streamlined single-screen interface focused on prayer times
-- ✅ Centered "Waktu Solat" title in custom header  
-- ✅ Settings accessible via gear icon button on header right
-- ✅ Modern modal sheet for settings with smooth animations
-- ✅ Maintained all existing functionality while improving accessibility
-- ✅ Better visual hierarchy with header separation from content
+- ✅ Simplified settings with clear, functional options only
+- ✅ User control over optional prayer time visibility  
+- ✅ Persistent preferences using AsyncStorage
+- ✅ Maintained visual consistency and prayer order
+- ✅ Protected main prayer times from being hidden
+- ✅ Better organized settings with clear categorization
 
-**Next Session Priorities:** Address TypeScript issues, add testing, and consider additional user experience enhancements.
+**Next Session Priorities:** Implement actual notification functionality, address TypeScript issues, and consider notification scheduling features.
 
 ---
 

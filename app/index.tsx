@@ -11,6 +11,7 @@ import { PrayerTimeCard } from '../components/prayer/PrayerTimeCard'
 import { QiblaDirection } from '../components/prayer/QiblaDirection'
 import { ZoneSelector } from '../components/prayer/ZoneSelector'
 import { SettingsSheet } from '../components/prayer/SettingsSheet'
+import { usePrayerPreferences } from '../contexts/PrayerPreferencesContext'
 
 export default function PrayerTimesScreen() {
   const [prayerData, setPrayerData] = useState<PrayerResponse | null>(null)
@@ -18,6 +19,7 @@ export default function PrayerTimesScreen() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const { preferences } = usePrayerPreferences()
   const toast = useToastController()
   
   const fetchPrayerTimes = async (showLoading = true) => {
@@ -145,15 +147,17 @@ export default function PrayerTimesScreen() {
             currentPrayer={current}
           />
           
-          {/* All Prayer Times in API Order */}
-          {/* Imsak */}
-          <PrayerTimeCard
-            prayer={{ key: 'imsak', name: 'Imsak', nameArabic: 'إمساك' }}
-            time={todayPrayer.imsak}
-            isAdditional={true}
-          />
+          {/* All Prayer Times in API Order with conditional rendering */}
+          {/* Imsak - Optional */}
+          {preferences.showImsak && (
+            <PrayerTimeCard
+              prayer={{ key: 'imsak', name: 'Imsak', nameArabic: 'إمساك' }}
+              time={todayPrayer.imsak}
+              isAdditional={true}
+            />
+          )}
           
-          {/* Fajr (Subuh) */}
+          {/* Fajr (Subuh) - Always shown */}
           <PrayerTimeCard
             prayer={{ key: 'fajr', name: 'Subuh', nameArabic: 'فجر' }}
             time={todayPrayer.fajr}
@@ -162,21 +166,25 @@ export default function PrayerTimesScreen() {
             isAdditional={false}
           />
           
-          {/* Syuruk */}
-          <PrayerTimeCard
-            prayer={{ key: 'syuruk', name: 'Syuruk', nameArabic: 'شروق' }}
-            time={todayPrayer.syuruk}
-            isAdditional={true}
-          />
+          {/* Syuruk - Optional */}
+          {preferences.showSyuruk && (
+            <PrayerTimeCard
+              prayer={{ key: 'syuruk', name: 'Syuruk', nameArabic: 'شروق' }}
+              time={todayPrayer.syuruk}
+              isAdditional={true}
+            />
+          )}
           
-          {/* Dhuha */}
-          <PrayerTimeCard
-            prayer={{ key: 'dhuha', name: 'Dhuha', nameArabic: 'ضحى' }}
-            time={todayPrayer.dhuha}
-            isAdditional={true}
-          />
+          {/* Dhuha - Optional */}
+          {preferences.showDhuha && (
+            <PrayerTimeCard
+              prayer={{ key: 'dhuha', name: 'Dhuha', nameArabic: 'ضحى' }}
+              time={todayPrayer.dhuha}
+              isAdditional={true}
+            />
+          )}
           
-          {/* Dhuhr (Zohor) */}
+          {/* Dhuhr (Zohor) - Always shown */}
           <PrayerTimeCard
             prayer={{ key: 'dhuhr', name: 'Zohor', nameArabic: 'ظهر' }}
             time={todayPrayer.dhuhr}
@@ -185,7 +193,7 @@ export default function PrayerTimesScreen() {
             isAdditional={false}
           />
           
-          {/* Asr (Asar) */}
+          {/* Asr (Asar) - Always shown */}
           <PrayerTimeCard
             prayer={{ key: 'asr', name: 'Asar', nameArabic: 'عصر' }}
             time={todayPrayer.asr}
@@ -194,7 +202,7 @@ export default function PrayerTimesScreen() {
             isAdditional={false}
           />
           
-          {/* Maghrib */}
+          {/* Maghrib - Always shown */}
           <PrayerTimeCard
             prayer={{ key: 'maghrib', name: 'Maghrib', nameArabic: 'مغرب' }}
             time={todayPrayer.maghrib}
@@ -203,7 +211,7 @@ export default function PrayerTimesScreen() {
             isAdditional={false}
           />
           
-          {/* Isha (Isyak) */}
+          {/* Isha (Isyak) - Always shown */}
           <PrayerTimeCard
             prayer={{ key: 'isha', name: 'Isyak', nameArabic: 'عشاء' }}
             time={todayPrayer.isha}
