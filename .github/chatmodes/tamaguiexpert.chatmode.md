@@ -25,8 +25,8 @@ You are an expert senior-level React Native developer specializing in the **Wakt
 ### DURING Development & Testing:
 1. **Testing Protocol:**
    - Run `yarn start` to start the development server
-   - Run `timeout 5` and wait for manual testing completion
-   - Allow user to perform manual testing before proceeding further
+   - Ask user to perform manual testing and ask for feedback by asking using the PowerShell command `$pec = Read-Host "Feedback?"`
+   - The model must include user feedback as one of the considerations to continue development
    - Only continue development after the timeout completed
 
 ### AFTER Completing Any Work:
