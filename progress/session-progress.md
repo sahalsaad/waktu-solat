@@ -2,6 +2,151 @@
 
 ## Current Session Accomplishments
 
+### 🎯 **Main Task Completed: Comprehensive UI/UX Improvements & Switch Optimization**
+
+#### 📋 **User Requested 6 Specific Improvements:**
+1. **Redesign combined header** - Show date and next prayer time side-by-side 
+2. **Convert to 12-hour time format** - All prayer times with AM/PM
+3. **Remove "Tentang Aplikasi"** - Simplify settings by removing About section
+4. **Remove theme description text** - Clean up theme section 
+5. **Remove "Tukar" text** - Zone selector shows only zone names
+6. **Centralize text constants** - Move all texts to constants for easy translation
+
+#### Solution Implemented:
+
+1. **Created Centralized Text Management System**
+   - **File:** `constants/texts.ts` - New file for all app text strings
+   - **Structure:** Organized by component/feature for easy maintenance
+   - **Benefits:** 
+     - Single source of truth for all text content
+     - Easy localization/translation preparation
+     - Consistent terminology across app
+     - Easy updates without searching multiple files
+   - **Text Categories:** Prayers, UI elements, settings, zone selection, headers
+
+2. **Redesigned Combined Header Layout**
+   - **File:** `components/prayer/CombinedHeader.tsx` - Complete layout overhaul
+   - **Change:** Vertical stack → Horizontal side-by-side layout
+   - **New Features:**
+     - Date information on left side with calendar icon
+     - Next prayer countdown on right side with clock icon
+     - Vertical divider between sections
+     - Maintained left border color coding (coral for date, blue for prayer)
+     - Better space utilization and visual balance
+   - **User Experience:** More information visible at glance, cleaner layout
+
+3. **Implemented 12-Hour Time Format**
+   - **File:** `utils/prayerUtils.ts` - Added formatTime12Hour() function
+   - **Applied to:** All prayer time displays throughout app
+   - **Features:**
+     - Converts 24-hour format (18:30) to 12-hour (6:30 PM)
+     - Proper AM/PM handling
+     - Midnight and noon edge cases handled correctly
+   - **Benefits:** More familiar time format for users
+
+4. **Simplified Settings Interface**
+   - **File:** `components/prayer/SettingsSheet.tsx` - Content cleanup
+   - **Removed:** "Tentang Aplikasi" (About Application) section entirely
+   - **Removed:** Theme description text, now shows only "Dark Theme" with icon
+   - **Maintained:** Essential notification and prayer display settings
+   - **Result:** Cleaner, more focused settings with less clutter
+
+5. **Enhanced Zone Selector Experience**
+   - **File:** `components/prayer/ZoneSelector.tsx` - Text simplification
+   - **Removed:** "Tukar" (Change) text label from zone display
+   - **Shows:** Only zone name and state for cleaner presentation
+   - **Improved:** Better spacing and layout for zone selection button
+   - **Result:** Cleaner interface without redundant labels
+
+6. **Fixed Zone Selection Persistence**
+   - **File:** `contexts/PrayerPreferencesContext.tsx` - Added zone persistence
+   - **Issue:** Selected zone was not saving across app restarts
+   - **Solution:** Added selectedZone to preferences with AsyncStorage persistence
+   - **Benefits:** User's zone choice now persists permanently
+
+7. **Optimized Switch Components Performance**
+   - **File:** `components/prayer/SettingsSheet.tsx` - Multiple optimization iterations
+   - **Problem:** Switch components were flickering when any switch was toggled
+   - **Solutions Applied:**
+     - React.memo() for SettingCard components to prevent unnecessary re-renders
+     - Local state management for instant UI feedback
+     - Optimistic updates with background AsyncStorage saving
+     - Removed background color animations for instant response
+     - Simplified thumb animations for smoother experience
+   - **Result:** Switches now respond instantly without affecting other switches
+
+#### Technical Implementation Details:
+
+**Text Constants Architecture:**
+```typescript
+export const TEXTS = {
+  prayers: {
+    imsak: 'Imsak',
+    subuh: 'Subuh', 
+    syuruk: 'Syuruk',
+    // ... all prayer names
+  },
+  ui: {
+    selectZone: 'Pilih Zon',
+    settings: 'Tetapan',
+    // ... all UI elements
+  },
+  settings: {
+    title: 'Tetapan Aplikasi',
+    // ... all settings text
+  }
+}
+```
+
+**12-Hour Time Format Function:**
+```typescript
+export const formatTime12Hour = (time24: string): string => {
+  const [hours, minutes] = time24.split(':').map(Number)
+  const period = hours >= 12 ? 'PM' : 'AM'
+  const hours12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours
+  return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`
+}
+```
+
+**Optimized Switch Component:**
+```typescript
+const SettingCard = memo(({ icon, title, description, value, onToggle, uniqueKey }) => (
+  // Memoized component prevents unnecessary re-renders
+  // Local state for instant UI feedback
+  // Background saving to AsyncStorage
+))
+```
+
+**Side-by-Side Header Layout:**
+```typescript
+<XStack alignItems="center" justifyContent="space-between" flex={1}>
+  <XStack alignItems="center" gap="$3" flex={1}>
+    {/* Date section on left */}
+  </XStack>
+  <YStack width={1} height="60%" backgroundColor="#30363d" />
+  <XStack alignItems="center" gap="$3" flex={1}>
+    {/* Next prayer section on right */}
+  </XStack>
+</XStack>
+```
+
+#### Session Testing Results:
+- ✅ All 6 user requests successfully implemented
+- ✅ Text constants centralized and working across all components  
+- ✅ Combined header shows date and next prayer side-by-side
+- ✅ All prayer times display in 12-hour format with AM/PM
+- ✅ Settings simplified with About section removed
+- ✅ Theme section cleaned up to show only "Dark Theme"
+- ✅ Zone selector shows only zone names without "Tukar" label
+- ✅ Zone selection now persists across app restarts
+- ✅ Switch flickering completely resolved
+- ✅ Switches respond instantly without affecting other switches
+- ✅ App loads and functions correctly with all improvements
+
+---
+
+## Previous Session Accomplishments
+
 ### 🎯 **Main Task Completed: Fixed Zone Selection Bug & Improved User Experience**
 
 #### Problem Identified:

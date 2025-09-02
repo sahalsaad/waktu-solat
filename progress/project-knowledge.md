@@ -50,6 +50,109 @@ app/
 
 components/
 ├── prayer/
+│   ├── CombinedHeader.tsx    # Date & next prayer side-by-side layout (12-hour format)
+│   ├── SettingsSheet.tsx     # Optimized settings with instant responsive switches
+│   ├── PrayerTimeCard.tsx    # Enhanced with isAdditional prop & 12-hour format
+│   ├── QiblaDirection.tsx    # Qibla compass
+│   └── ZoneSelector.tsx      # Searchable sheet with persistent zone selection
+├── Provider.tsx         # App providers
+└── CurrentToast.tsx     # Toast notifications
+
+constants/
+└── texts.ts            # Centralized text constants for easy translation/updates
+
+contexts/
+└── PrayerPreferencesContext.tsx  # Prayer preferences + zone persistence with AsyncStorage
+
+services/
+└── prayerService.ts     # Monthly API integration with caching system
+
+types/
+└── prayer.ts           # TypeScript interfaces including CachedPrayerData
+
+utils/
+└── prayerUtils.ts      # Date formatting, calculations, 12-hour time format
+```
+
+## 🎨 **Design System & UI Patterns**
+
+### **Text Management System** (`constants/texts.ts`):
+```typescript
+export const TEXTS = {
+  prayers: {
+    imsak: 'Imsak',
+    subuh: 'Subuh',
+    syuruk: 'Syuruk',
+    dhuha: 'Dhuha',
+    zohor: 'Zohor',
+    asr: 'Asar', 
+    maghrib: 'Maghrib',
+    isyak: 'Isyak'
+  },
+  ui: {
+    selectZone: 'Pilih Zon',
+    settings: 'Tetapan',
+    today: 'Hari ini',
+    nextPrayer: 'Solat Seterusnya',
+    currentPrayer: 'Waktu Solat Sekarang'
+  },
+  settings: {
+    title: 'Tetapan Aplikasi',
+    subtitle: 'Konfigurasi tetapan notifikasi dan paparan waktu solat',
+    prayerNotification: 'Notifikasi Waktu Solat',
+    earlyNotification: 'Notifikasi Awal',
+    showImsak: 'Tunjukkan Imsak',
+    showSyuruk: 'Tunjukkan Syuruk',
+    showDhuha: 'Tunjukkan Dhuha',
+    darkTheme: 'Tema Gelap'
+  },
+  zoneSelector: {
+    title: 'Pilih Zon Waktu Solat',
+    search: 'Cari zon, negeri atau kod...',
+    zonesFound: 'zon dijumpai'
+  }
+}
+```
+
+### **Theme Configuration** (`tamagui.config.ts`):
+- **Primary Colors:** Arch Linux inspired palette
+  - `$archPrimary`: #1793d1 (Arch Linux blue)
+  - `$archAccent`: #f78166 (Coral accent) 
+  - `$archSurface`: Dark surface colors (#161b22)
+  - `$archText`: Light text on dark background (#f0f6fc)
+- **Navigation:** Single screen with header, no tab bar
+- **Modal Design:** Sheet component with proper overlay and animations
+
+### **Visual Design Patterns:**
+- **Left Border Color Coding:**
+  - 🔵 Blue borders: Main obligatory prayers (Subuh, Zohor, Asar, Maghrib, Isyak)
+  - 🟠 Coral borders: Additional/Sunnah prayers (Imsak, Syuruk, Dhuha)
+- **Prayer State Indicators:**
+  - Normal prayer: 2px border
+  - Next prayer: 4px border with primary color
+  - Current prayer period: Background highlight
+- **Combined Header Layout:** 
+  - Date information (left) with calendar icon and coral accent border
+  - Next prayer countdown (right) with clock icon and blue primary border
+  - Vertical divider separating sections
+  - Side-by-side horizontal layout for space efficiency
+- **12-Hour Time Format:** All prayer times display with AM/PM (e.g., "6:30 PM")
+- **Settings Design:** 
+  - Clean cards without redundant icons for prayer display toggles
+  - Instant responsive switches with optimistic UI updates
+  - Organized sections with clear visual hierarchy
+- **Zone Selection:** 
+  - No redundant "Tukar" label, shows only zone name
+  - Persistent selection across app restarts
+```
+app/
+├── index.tsx             # Main prayer times screen with monthly caching & conditional rendering
+├── _layout.tsx           # Stack navigation with PrayerPreferencesProvider
+├── modal.tsx            # Existing modal screens
+└── +not-found.tsx       # 404 page
+
+components/
+├── prayer/
 │   ├── SettingsSheet.tsx     # Enhanced settings with prayer toggles & clean icons
 │   ├── DateHeader.tsx        # Date and location information display
 │   ├── NextPrayerCountdown.tsx # Next prayer countdown timer
@@ -140,6 +243,9 @@ interface PrayerPreferences {
   showImsak: boolean
   showSyuruk: boolean
   showDhuha: boolean
+  
+  // Zone selection persistence
+  selectedZone: Zone
 }
 
 // Complete Malaysian zone coverage (77 zones across 14 states)
@@ -160,6 +266,60 @@ const MALAYSIAN_ZONES = {
   "Wilayah Persekutuan": ["WLY01", "WLY02"]
 }
 ```
+
+## 🔧 **Time Format & Display System**
+
+### **12-Hour Time Format Implementation** (`utils/prayerUtils.ts`):
+```typescript
+export const formatTime12Hour = (time24: string): string => {
+  const [hours, minutes] = time24.split(':').map(Number)
+  const period = hours >= 12 ? 'PM' : 'AM'
+  const hours12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours
+  return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`
+}
+```
+
+### **Time Display Benefits:**
+- ✅ Converts 24-hour API format (18:30) to user-friendly 12-hour format (6:30 PM)
+- ✅ Proper handling of midnight (00:00 → 12:00 AM) and noon (12:00 → 12:00 PM)
+- ✅ Consistent AM/PM formatting across all prayer times
+- ✅ Applied to all prayer time displays throughout the app
+
+## 🎛️ **Switch Component Optimization System**
+
+### **Performance Optimized Settings** (`components/prayer/SettingsSheet.tsx`):
+```typescript
+// Memoized component prevents unnecessary re-renders
+const SettingCard = memo(({ icon, title, description, value, onToggle, uniqueKey }) => (
+  <Card>
+    <Switch
+      checked={value}
+      onCheckedChange={onToggle}
+      size="$4"
+      style={{ backgroundColor: value ? '#1793d1' : '#30363d' }}
+    >
+      <Switch.Thumb backgroundColor="#ffffff" />
+    </Switch>
+  </Card>
+))
+
+// Optimized context with instant UI updates
+const updatePreferences = async (newPreferences) => {
+  // Immediately update state for responsive UI
+  const updatedPreferences = { ...preferences, ...newPreferences }
+  setPreferences(updatedPreferences)
+  
+  // Save to storage asynchronously without blocking UI
+  AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPreferences))
+}
+```
+
+### **Switch Optimization Benefits:**
+- ✅ **No Flickering:** React.memo prevents unnecessary re-renders of other switches
+- ✅ **Instant Response:** Optimistic updates provide immediate visual feedback
+- ✅ **Background Saving:** AsyncStorage operations don't block UI interactions
+- ✅ **Stable Animations:** Simplified animations for smooth thumb movement
+- ✅ **Unique Keys:** Proper component identification for React optimization
 
 ## 🔧 **Date Handling System**
 
@@ -260,25 +420,33 @@ const formatGregorianDate = (dateString: string): string => {
 ## 🚀 **Future Development Roadmap**
 
 ### **Immediate Priorities:**
-1. **Fix TypeScript Issues:** Update Tamagui configuration or prop usage
+1. **Add Localization System:** Extend text constants system for multiple languages
 2. **Testing:** Add unit tests for prayer time calculations and caching
 3. **Accessibility:** Add screen reader support for prayer times
-4. **Performance:** Optimize re-renders during countdown updates
+4. **Performance:** Further optimize countdown updates and re-renders
 
 ### **Feature Enhancements:**
 1. **Notifications:** Implement actual prayer time reminders (currently UI-only)
 2. **Audio:** Add Adhan (call to prayer) audio support
-3. **Themes:** Add light mode support
+3. **Themes:** Add light mode support while maintaining current dark theme
 4. **Advanced Customization:** Add prayer time adjustment settings
 5. **Widgets:** Home screen widget support
 6. **Calendar Integration:** Islamic calendar features
 7. **Qibla Compass:** Enhanced qibla direction with compass integration
 
 ### **Performance Optimizations:**
-1. Implement proper memo for prayer cards
-2. Optimize monthly data parsing
-3. Add progressive loading for zone selection
-4. Implement better cache management strategies
+1. ✅ **Switch Performance:** Resolved flickering and implemented instant response
+2. ✅ **Text Management:** Centralized for easy updates and future translation
+3. ✅ **Zone Persistence:** User selections now save permanently
+4. ✅ **12-Hour Format:** Implemented user-friendly time display
+5. ✅ **Header Optimization:** Side-by-side layout for better space utilization
+
+### **Architecture Improvements:**
+1. **Enhanced State Management:** Consider Zustand for complex state
+2. **Component Library:** Build reusable prayer time components
+3. **Error Boundaries:** Implement proper error handling
+4. **Bundle Optimization:** Tree shaking and code splitting
+5. **Type Safety:** Strengthen TypeScript usage across components
 
 ---
 
