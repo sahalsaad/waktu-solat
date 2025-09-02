@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
 import { YStack, XStack, Text, Switch, Card, Button, Sheet, H2 } from 'tamagui'
-import { Bell, Clock, Moon, X } from '@tamagui/lucide-icons'
+import { Bell, Clock, Moon, X, Bug, Trash2 } from '@tamagui/lucide-icons'
 import { usePrayerPreferences } from '../../contexts/PrayerPreferencesContext'
 import { TEXTS } from '../../constants/texts'
 
@@ -65,7 +65,7 @@ const SettingCard = memo(({ icon, title, description, value, onToggle, uniqueKey
 ))
 
 export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
-  const { preferences, updatePreferences } = usePrayerPreferences()
+  const { preferences, updatePreferences, lastError, clearPreferences, debugAsyncStorage } = usePrayerPreferences()
 
   const notificationSettings = [
     {
@@ -235,6 +235,62 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
                     </YStack>
                   </XStack>
                 </Card>
+              </YStack>
+
+              {/* Debug Section */}
+              <YStack marginTop="$6">
+                <Text
+                  fontSize="$4"
+                  fontWeight="600"
+                  color="#f78166"
+                  marginBottom="$2"
+                >
+                  Debug Tools (Android Testing)
+                </Text>
+                
+                {/* Error Display */}
+                {lastError && (
+                  <Card
+                    backgroundColor="#2d1b1b"
+                    borderColor="#e53e3e"
+                    borderWidth={1}
+                    padding="$3"
+                    marginBottom="$3"
+                    borderRadius="$3"
+                  >
+                    <Text color="#ff6b6b" fontSize="$2">
+                      {lastError}
+                    </Text>
+                  </Card>
+                )}
+                
+                <XStack gap="$3">
+                  <Button
+                    flex={1}
+                    backgroundColor="#30363d"
+                    borderColor="#f78166"
+                    borderWidth={1}
+                    onPress={debugAsyncStorage}
+                    icon={<Bug color="#f78166" size={16} />}
+                  >
+                    <Text color="#f78166" fontSize="$3">
+                      Debug Storage
+                    </Text>
+                  </Button>
+                  
+                  <Button
+                    flex={1}
+                    backgroundColor="#30363d"
+                    borderColor="#e53e3e"
+                    borderWidth={1}
+                    onPress={clearPreferences}
+                    icon={<Trash2 color="#e53e3e" size={16} />}
+                  >
+                    <Text color="#e53e3e" fontSize="$3">
+                      Clear Data
+                    </Text>
+                  </Button>
+                </XStack>
               </YStack>
 
               {/* Bottom padding for safe area */}

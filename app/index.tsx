@@ -117,8 +117,8 @@ export default function PrayerTimesScreen() {
     )
   }
   
-  const { current, next } = getCurrentPrayer(todayPrayer)
-  const { timeLeft, nextPrayer } = getNextPrayerCountdown(todayPrayer)
+  const { current, next } = getCurrentPrayer(todayPrayer, preferences)
+  const { timeLeft, nextPrayer } = getNextPrayerCountdown(todayPrayer, preferences)
   
   return (
     <YStack flex={1} backgroundColor="#0d1117">
@@ -197,6 +197,8 @@ export default function PrayerTimesScreen() {
             <PrayerTimeCard
               prayer={{ key: 'imsak', name: TEXTS.prayers.imsak, nameArabic: 'إمساك' }}
               time={todayPrayer.imsak}
+              isNext={nextPrayer === TEXTS.prayers.imsak}
+              isCurrent={current === TEXTS.prayers.imsak}
               isAdditional={true}
             />
           )}
@@ -215,6 +217,8 @@ export default function PrayerTimesScreen() {
             <PrayerTimeCard
               prayer={{ key: 'syuruk', name: TEXTS.prayers.syuruk, nameArabic: 'شروق' }}
               time={todayPrayer.syuruk}
+              isNext={nextPrayer === TEXTS.prayers.syuruk}
+              isCurrent={current === TEXTS.prayers.syuruk}
               isAdditional={true}
             />
           )}
@@ -224,6 +228,8 @@ export default function PrayerTimesScreen() {
             <PrayerTimeCard
               prayer={{ key: 'dhuha', name: TEXTS.prayers.dhuha, nameArabic: 'ضحى' }}
               time={todayPrayer.dhuha}
+              isNext={nextPrayer === TEXTS.prayers.dhuha}
+              isCurrent={current === TEXTS.prayers.dhuha}
               isAdditional={true}
             />
           )}

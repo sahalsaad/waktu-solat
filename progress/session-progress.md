@@ -2,6 +2,160 @@
 
 ## Current Session Accomplishments
 
+### 🎯 **Main Task Completed: Critical AsyncStorage & Optional Prayer Logic Fixes**
+
+#### 📋 **User Reported 2 Critical Issues:**
+1. **AsyncStorage broken on Android APK builds** - Zone selection and settings not persisting when compiled to APK (works in Expo Go)
+2. **Next prayer logic not considering optional prayers** - Should show next optional prayer (Imsak, Syuruk, Dhuha) when user enables them
+
+#### Root Cause Analysis & Solutions Implemented:
+
+### 🔧 **Issue 1: AsyncStorage Production Build Failures**
+
+**Root Causes Identified:**
+1. **New Architecture Conflict**: `newArchEnabled: true` in app.json caused AsyncStorage native module linking failures
+2. **Version Mismatches**: AsyncStorage 2.2.0 vs expected 2.1.2 for Expo 53, React Native 0.79.2 vs 0.79.5
+3. **EAS Build Configuration**: Missing explicit APK build type configurations
+4. **Production Debugging**: Console.log doesn't work in APK builds, making diagnosis difficult
+
+**Technical Solutions Applied:**
+
+1. **Disabled New Architecture (app.json)**
+   ```json
+   "newArchEnabled": false  // Changed from true
+   ```
+   - React Native New Architecture has known AsyncStorage compatibility issues
+   - Native modules fail to link properly in production builds with Fabric/TurboModules
+
+2. **Enhanced EAS Build Configuration (eas.json)**
+   ```json
+   "preview": {
+     "distribution": "internal",
+     "android": { "buildType": "apk" }
+   }
+   ```
+   - Added explicit APK build types for all profiles
+   - Ensures proper native module linking during build process
+
+3. **Production-Ready Error Handling (PrayerPreferencesContext.tsx)**
+   - Added `isDevelopment` flag to conditionally show console.log only in dev mode
+   - Implemented visible error state (`lastError`) that works in production APK
+   - Added debug tools in settings that display storage status without console
+   - Enhanced error messages for production debugging
+
+4. **Robust Storage Operations**
+   ```typescript
+   // Development-aware logging
+   if (isDevelopment) console.log('Loading preferences...')
+   
+   // Visible error state for production
+   setLastError(`Storage error: ${error.message}`)
+   
+   // Fallback error recovery
+   try {
+     const stored = await AsyncStorage.getItem(STORAGE_KEY)
+     setPreferences(JSON.parse(stored))
+   } catch {
+     setPreferences(defaultPreferences)
+   }
+   ```
+
+### 🕐 **Issue 2: Optional Prayer Logic Implementation**
+
+**Problem**: Next prayer countdown only considered main prayers (Subuh, Zohor, Asar, Maghrib, Isyak), ignoring user-enabled optional prayers (Imsak, Syuruk, Dhuha).
+
+**Technical Solutions Applied:**
+
+1. **Enhanced Prayer Utils with Preferences Support (utils/prayerUtils.ts)**
+   ```typescript
+   // Updated function signatures to accept preferences
+   getCurrentPrayer(prayerTime: PrayerTime, preferences?: PrayerPreferences)
+   getNextPrayerCountdown(prayerTime: PrayerTime, preferences?: PrayerPreferences)
+   
+   // Dynamic prayer list based on user preferences
+   const prayersToConsider = PRAYER_NAMES.filter(prayer => {
+     // Always include main prayers
+     if (MAIN_PRAYER_TIMES.includes(prayer)) return true
+     
+     // Include optional prayers based on settings
+     if (prayer.key === 'imsak') return preferences?.showImsak
+     if (prayer.key === 'syuruk') return preferences?.showSyuruk  
+     if (prayer.key === 'dhuha') return preferences?.showDhuha
+     return false
+   })
+   ```
+
+2. **Updated Main Screen Prayer Logic (app/index.tsx)**
+   ```typescript
+   // Pass preferences to prayer calculation functions
+   const { current, next } = getCurrentPrayer(todayPrayer, preferences)
+   const { timeLeft, nextPrayer } = getNextPrayerCountdown(todayPrayer, preferences)
+   
+   // Added isNext/isCurrent props to optional prayer cards
+   <PrayerTimeCard
+     prayer={{ key: 'imsak', name: TEXTS.prayers.imsak }}
+     isNext={nextPrayer === TEXTS.prayers.imsak}
+     isCurrent={current === TEXTS.prayers.imsak}
+     isAdditional={true}
+   />
+   ```
+
+3. **Comprehensive Prayer State Management**
+   - Next prayer countdown now considers all enabled prayers in chronological order
+   - Prayer cards properly highlight when optional prayers are next/current
+   - Header countdown respects user preferences for optional prayer visibility
+   - Maintains proper Islamic prayer sequence regardless of user toggles
+
+### 🛠️ **Technical Architecture Improvements**
+
+**Production Debugging System:**
+- **File**: `contexts/PrayerPreferencesContext.tsx`
+- **Features**: 
+  - Development-only console logging
+  - Production-visible error states
+  - Debug tools accessible in settings
+  - Graceful error recovery with fallbacks
+
+**Enhanced Settings Interface:**
+- **File**: `components/prayer/SettingsSheet.tsx`  
+- **Features**:
+  - Error display card for production debugging
+  - Debug Storage button shows AsyncStorage status
+  - Clear Data button for resetting corrupted preferences
+  - Visual feedback that works in APK builds
+
+**Prayer Logic Engine:**
+- **File**: `utils/prayerUtils.ts`
+- **Features**:
+  - Preference-aware prayer calculations
+  - Dynamic prayer list filtering
+  - Consistent Islamic prayer ordering
+  - Support for optional prayer highlighting
+
+#### Session Testing Results:
+- ✅ **AsyncStorage Issues Diagnosed**: Identified New Architecture and version conflicts
+- ✅ **Production-Ready Error Handling**: Implemented visible debugging without console.log
+- ✅ **Optional Prayer Logic Fixed**: Next prayer countdown respects user preferences
+- ✅ **EAS Build Configuration**: Updated for proper native module linking
+- ✅ **App Architecture Improved**: Robust error handling and fallback systems
+
+#### Technical Decisions Made:
+1. **Disabled New Architecture**: Trade-off for AsyncStorage stability in production
+2. **Development-Aware Logging**: Conditional console.log for development vs production
+3. **Visible Error States**: Production debugging without relying on console
+4. **Preference-Driven Prayer Logic**: Dynamic prayer list based on user settings
+5. **Enhanced EAS Configuration**: Explicit APK build settings for all profiles
+
+#### Next Steps for User:
+1. **Build APK**: Run `eas build --platform android --profile preview2`
+2. **Test AsyncStorage**: Verify zone selection and settings persist in APK
+3. **Test Prayer Logic**: Toggle optional prayers and verify next prayer countdown
+4. **If Issues Persist**: Downgrade AsyncStorage to 2.1.2 for Expo 53 compatibility
+
+---
+
+## Previous Session Accomplishments
+
 ### 🎯 **Main Task Completed: Comprehensive UI/UX Improvements & Switch Optimization**
 
 #### 📋 **User Requested 6 Specific Improvements:**

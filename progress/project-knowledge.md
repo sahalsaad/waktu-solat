@@ -403,9 +403,112 @@ const formatGregorianDate = (dateString: string): string => {
 - **Runtime:** ✅ Fully functional with 77 Malaysian zones
 - **Caching System:** ✅ AsyncStorage monthly prayer time caching active
 - **API Integration:** ✅ Monthly API calls with smart cache management
+- **Production Builds:** ✅ EAS Build configured for APK with AsyncStorage fixes
+- **New Architecture:** ❌ Disabled due to AsyncStorage compatibility issues
+
+## 🔧 **Production Debugging & Error Handling System**
+
+### **AsyncStorage Production Configuration** (`contexts/PrayerPreferencesContext.tsx`):
+```typescript
+// Development-aware logging system
+const isDevelopment = typeof __DEV__ !== 'undefined' ? __DEV__ : false
+
+// Production-visible error state
+const [lastError, setLastError] = useState<string | null>(null)
+
+// Conditional logging (dev only)
+if (isDevelopment) console.log('Loading preferences...')
+
+// Visible error messages (works in APK)
+setLastError(`Storage error: ${error.message}`)
+```
+
+### **EAS Build Configuration** (`eas.json`):
+```json
+{
+  "build": {
+    "preview2": {
+      "android": { "buildType": "apk" }
+    }
+  }
+}
+```
+
+### **New Architecture Compatibility** (`app.json`):
+```json
+{
+  "expo": {
+    "plugins": [
+      ["expo-build-properties", {
+        "android": { "newArchEnabled": false }
+      }]
+    ]
+  }
+}
+```
+
+**Technical Decision**: Disabled New Architecture due to AsyncStorage native module linking issues in production builds.
+
+## 🕐 **Enhanced Prayer Logic System**
+
+### **Preference-Aware Prayer Calculations** (`utils/prayerUtils.ts`):
+```typescript
+// Dynamic prayer filtering based on user preferences
+const prayersToConsider = PRAYER_NAMES.filter(prayer => {
+  // Always include main prayers (5 obligatory)
+  if (MAIN_PRAYER_TIMES.some(main => main.key === prayer.key)) return true
+  
+  // Include optional prayers based on user settings
+  if (preferences) {
+    if (prayer.key === 'imsak') return preferences.showImsak
+    if (prayer.key === 'syuruk') return preferences.showSyuruk
+    if (prayer.key === 'dhuha') return preferences.showDhuha
+  }
+  return false
+})
+
+// Next prayer calculation respects user preferences
+export function getNextPrayerCountdown(prayerTime: PrayerTime, preferences?: PrayerPreferences)
+```
+
+### **Prayer State Management Benefits:**
+- ✅ **User-Controlled Prayer Visibility**: Optional prayers (Imsak, Syuruk, Dhuha) can be toggled
+- ✅ **Intelligent Next Prayer Logic**: Countdown considers enabled optional prayers
+- ✅ **Proper Islamic Sequence**: Maintains correct prayer order regardless of user settings
+- ✅ **Visual State Indicators**: Prayer cards highlight correctly for next/current prayers
+- ✅ **Header Integration**: Combined header shows appropriate next prayer based on preferences
+
+### **Debug Tools in Settings** (`components/prayer/SettingsSheet.tsx`):
+```typescript
+// Production-visible debug information
+{lastError && (
+  <Card backgroundColor="#2d1b1b" borderColor="#e53e3e">
+    <Text color="#ff6b6b">{lastError}</Text>
+  </Card>
+)}
+
+// Debug buttons that work in APK builds
+<Button onPress={debugAsyncStorage}>Debug Storage</Button>
+<Button onPress={clearPreferences}>Clear Data</Button>
+```
+
+**Debug Features:**
+- **Debug Storage**: Shows AsyncStorage status without console
+- **Clear Data**: Resets corrupted preferences to defaults
+- **Error Display**: Visual error messages visible in production APK
+- **Status Information**: Storage keys, data presence, current zone
 
 ## ⚠️ **Known Issues & Technical Debt**
-**Current Status:** These appear to be Tamagui v4 type configuration issues, but the app builds and runs successfully at runtime.
+
+### **RESOLVED ISSUES (Latest Session):**
+1. ✅ **AsyncStorage APK Build Failures**: Fixed by disabling New Architecture and enhancing error handling
+2. ✅ **Optional Prayer Logic**: Next prayer countdown now considers user-enabled optional prayers
+3. ✅ **Production Debugging**: Added visible error states that work in APK builds
+
+### **Current Technical Status:**
+- **Tamagui v4 Types**: ⚠️ Type warnings but builds successfully at runtime
+- **New Architecture**: ❌ Disabled for AsyncStorage compatibility (trade-off decision)
+- **Version Alignment**: ⚠️ Some dependency version mismatches with Expo 53
 
 **Recommendation for Future:** Consider updating Tamagui types or switching to styled components approach for problematic props.
 

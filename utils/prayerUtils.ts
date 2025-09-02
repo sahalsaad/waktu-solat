@@ -1,10 +1,33 @@
-import { PrayerTime, MAIN_PRAYER_TIMES } from '../types/prayer'
+import { PrayerTime, MAIN_PRAYER_TIMES, PRAYER_NAMES } from '../types/prayer'
 
-export function getCurrentPrayer(prayerTime: PrayerTime): { current: string; next: string } {
+interface PrayerPreferences {
+  showImsak: boolean
+  showSyuruk: boolean
+  showDhuha: boolean
+}
+
+export function getCurrentPrayer(prayerTime: PrayerTime, preferences?: PrayerPreferences): { current: string; next: string } {
   const now = new Date()
   const currentTime = now.getHours() * 60 + now.getMinutes()
   
-  const prayers = MAIN_PRAYER_TIMES.map(prayer => ({
+  // Create list of prayers to consider based on preferences
+  const prayersToConsider = PRAYER_NAMES.filter(prayer => {
+    // Always include main prayers
+    if (MAIN_PRAYER_TIMES.some(mainPrayer => mainPrayer.key === prayer.key)) {
+      return true
+    }
+    
+    // Include optional prayers based on preferences
+    if (preferences) {
+      if (prayer.key === 'imsak') return preferences.showImsak
+      if (prayer.key === 'syuruk') return preferences.showSyuruk
+      if (prayer.key === 'dhuha') return preferences.showDhuha
+    }
+    
+    return false
+  })
+  
+  const prayers = prayersToConsider.map(prayer => ({
     name: prayer.name,
     time: timeStringToMinutes(prayerTime[prayer.key])
   })).sort((a, b) => a.time - b.time)
@@ -27,11 +50,28 @@ export function getCurrentPrayer(prayerTime: PrayerTime): { current: string; nex
   return { current, next }
 }
 
-export function getNextPrayerCountdown(prayerTime: PrayerTime): { timeLeft: string; nextPrayer: string } {
+export function getNextPrayerCountdown(prayerTime: PrayerTime, preferences?: PrayerPreferences): { timeLeft: string; nextPrayer: string } {
   const now = new Date()
   const currentTime = now.getHours() * 60 + now.getMinutes()
   
-  const prayers = MAIN_PRAYER_TIMES.map(prayer => ({
+  // Create list of prayers to consider based on preferences
+  const prayersToConsider = PRAYER_NAMES.filter(prayer => {
+    // Always include main prayers
+    if (MAIN_PRAYER_TIMES.some(mainPrayer => mainPrayer.key === prayer.key)) {
+      return true
+    }
+    
+    // Include optional prayers based on preferences
+    if (preferences) {
+      if (prayer.key === 'imsak') return preferences.showImsak
+      if (prayer.key === 'syuruk') return preferences.showSyuruk
+      if (prayer.key === 'dhuha') return preferences.showDhuha
+    }
+    
+    return false
+  })
+  
+  const prayers = prayersToConsider.map(prayer => ({
     name: prayer.name,
     time: timeStringToMinutes(prayerTime[prayer.key])
   })).sort((a, b) => a.time - b.time)
