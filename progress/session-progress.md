@@ -2,6 +2,104 @@
 
 ## Current Session Accomplishments
 
+### 🎯 **Main Task Completed: Fixed Zone Selection Bug & Improved User Experience**
+
+#### Problem Identified:
+- Zone selector dropdown was not selectable - button interactions failed
+- No search functionality for the 77 Malaysian zones
+- Cache status notifications exposed internal implementation details to users
+- Random inappropriate icons in settings for additional prayer times
+
+#### Solution Implemented:
+
+1. **Fixed Zone Selection Bug & Implemented Searchable Sheet**
+   - **Issue:** Original dropdown used nested buttons inside ScrollView causing touch event conflicts
+   - **Solution:** Complete redesign using Tamagui Sheet component
+   - **File:** `components/prayer/ZoneSelector.tsx` - Complete rewrite
+   - **New Features:**
+     - Modal sheet interface covering 85% of screen
+     - Real-time search functionality across zone name, state, and code
+     - Search results counter showing filtered zones
+     - Proper state grouping with visual hierarchy
+     - Selected zone highlighting with checkmark indicator
+     - Improved touch targets and visual feedback
+     - Clean dismissal with overlay tap or close button
+   - **User Experience:** 
+     - Easy search through 77 zones by typing state, area, or zone code
+     - Visual feedback shows "X zon dijumpai" (X zones found)
+     - Instant filtering as user types
+     - Proper Malaysian language interface
+
+2. **Removed Cache Status Notifications**
+   - **File:** `app/index.tsx` - Cleaned cache-related UI elements
+   - **Removed Elements:**
+     - Cache status state (`cacheStatus`) and related logic
+     - Header cache indicator ("💾 Data tersimpan" / "🔄 Data terkini")
+     - Cache-related toast notifications during refresh
+     - Monthly data info section with cache explanations
+   - **Benefits:** 
+     - Cleaner user interface without technical implementation details
+     - Users no longer see confusing cache terminology
+     - Focus on prayer times rather than technical mechanisms
+     - Simplified refresh experience
+
+3. **Improved Settings Visual Design**
+   - **File:** `components/prayer/SettingsSheet.tsx` - Icon cleanup
+   - **Issue:** Random icons (Moon, Volume2, Smartphone) for additional prayer times settings
+   - **Solution:** Removed inappropriate icons from prayer display settings
+   - **Updated Interface:** Clean text-only layout for additional prayer time toggles
+   - **Maintained:** Icons for notification settings where they make sense (Bell, Clock)
+
+#### Technical Implementation Details:
+
+**New Zone Selection Sheet Architecture:**
+```typescript
+// Real-time search filtering
+const filteredZones = MALAYSIAN_ZONES.filter(zone => 
+  zone.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  zone.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  zone.code.toLowerCase().includes(searchQuery.toLowerCase())
+)
+
+// State-based grouping of filtered results
+const groupedFilteredZones = filteredZones.reduce((acc, zone) => {
+  if (!acc[zone.state]) acc[zone.state] = []
+  acc[zone.state].push(zone)
+  return acc
+}, {} as Record<string, Zone[]>)
+```
+
+**Sheet Component Features:**
+- 85% screen height with proper snap points
+- Dismissible with `dismissOnSnapToBottom`
+- Proper overlay and handle
+- Search input with placeholder text in Malay
+- Results counter for user feedback
+- Clean state-based grouping with visual headers
+- Selected zone highlighting with checkmark
+- Responsive touch targets for mobile
+
+**Cache Status Removal:**
+- Eliminated all user-facing cache terminology
+- Maintained backend caching for performance
+- Simplified loading states to generic "Memuat waktu solat..."
+- Removed technical explanations from UI
+- Clean refresh experience without implementation details
+
+#### Session Testing Results:
+- ✅ Zone selection sheet opens correctly with search functionality
+- ✅ Real-time search works across zone names, states, and codes
+- ✅ Zone selection properly updates selected zone and closes sheet
+- ✅ All 77 Malaysian zones accessible and searchable
+- ✅ Cache status notifications completely removed from UI
+- ✅ Settings icons cleaned up for additional prayer times
+- ✅ All existing functionality preserved (prayer times, calculations, preferences)
+- ✅ User feedback: "it works great" - confirmed functionality improvement
+
+---
+
+## Previous Session Accomplishments
+
 ### 🎯 **Main Task Completed: Complete Malaysian Zone List & Monthly Prayer Time Caching**
 
 #### Problem Identified:

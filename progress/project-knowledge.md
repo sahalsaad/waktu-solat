@@ -38,6 +38,7 @@
   - Current prayer period: Background highlight
 - **Header Design:** Fixed dark header with centered title and settings button
 - **Settings Sheet:** Modal covering 90% screen height with drag handle
+- **Zone Selection:** Searchable modal sheet with real-time filtering across 77 Malaysian zones
 
 ## 📁 **Current Project Structure**
 ```
@@ -49,12 +50,12 @@ app/
 
 components/
 ├── prayer/
-│   ├── SettingsSheet.tsx     # Enhanced settings with prayer toggles
+│   ├── SettingsSheet.tsx     # Enhanced settings with prayer toggles & clean icons
 │   ├── DateHeader.tsx        # Date and location information display
 │   ├── NextPrayerCountdown.tsx # Next prayer countdown timer
 │   ├── PrayerTimeCard.tsx    # Enhanced with isAdditional prop
 │   ├── QiblaDirection.tsx    # Qibla compass
-│   └── ZoneSelector.tsx      # Location selector (77 Malaysian zones)
+│   └── ZoneSelector.tsx      # Searchable sheet with real-time zone filtering
 ├── Provider.tsx         # App providers
 └── CurrentToast.tsx     # Toast notifications
 
@@ -244,13 +245,6 @@ const formatGregorianDate = (dateString: string): string => {
 - **API Integration:** ✅ Monthly API calls with smart cache management
 
 ## ⚠️ **Known Issues & Technical Debt**
-
-### **TypeScript Compilation Issues:**
-The project has persistent TypeScript errors related to Tamagui prop definitions:
-- `alignItems`, `justifyContent` props not recognized
-- `backgroundColor`, `borderRadius` props flagged as invalid
-- `marginTop`, `paddingLeft` props not found in type definitions
-
 **Current Status:** These appear to be Tamagui v4 type configuration issues, but the app builds and runs successfully at runtime.
 
 **Recommendation for Future:** Consider updating Tamagui types or switching to styled components approach for problematic props.

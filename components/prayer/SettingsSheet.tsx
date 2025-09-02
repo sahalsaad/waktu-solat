@@ -4,7 +4,7 @@ import { Bell, Volume2, Smartphone, Clock, Info, Moon, X } from '@tamagui/lucide
 import { usePrayerPreferences } from '../../contexts/PrayerPreferencesContext'
 
 interface SettingItem {
-  icon: React.ReactNode
+  icon: React.ReactNode | null
   title: string
   description: string
   value?: boolean
@@ -39,21 +39,21 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
 
   const prayerDisplaySettings: SettingItem[] = [
     {
-      icon: <Moon color="#ffd700" size={20} />,
+      icon: null,
       title: 'Tampilkan Imsak',
       description: 'Paparkan waktu Imsak dalam senarai',
       value: preferences.showImsak,
       onToggle: (value) => updatePreferences({ showImsak: value }),
     },
     {
-      icon: <Volume2 color="#f78166" size={20} />,
+      icon: null,
       title: 'Tampilkan Syuruk',
       description: 'Paparkan waktu Syuruk dalam senarai',
       value: preferences.showSyuruk,
       onToggle: (value) => updatePreferences({ showSyuruk: value }),
     },
     {
-      icon: <Smartphone color="#1793d1" size={20} />,
+      icon: null,
       title: 'Tampilkan Dhuha',
       description: 'Paparkan waktu Dhuha dalam senarai',
       value: preferences.showDhuha,
@@ -72,8 +72,8 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
     >
       <XStack alignItems="center" justifyContent="space-between">
         <XStack alignItems="center" gap="$3" flex={1}>
-          {icon}
-          <YStack flex={1}>
+          {icon && icon}
+          <YStack flex={1} marginLeft={icon ? 0 : "$2"}>
             <Text
               fontSize="$4"
               fontWeight="600"

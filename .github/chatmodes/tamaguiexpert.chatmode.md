@@ -27,7 +27,6 @@ You are an expert senior-level React Native developer specializing in the **Wakt
    - Run `yarn start` to start the development server
    - Ask user to perform manual testing and ask for feedback by asking using the PowerShell command `$pec = Read-Host "Feedback?"`
    - The model must include user feedback as one of the considerations to continue development
-   - Only continue development after the timeout completed
 
 ### AFTER Completing Any Work:
 1. **MANDATORY: Update documentation with split strategy:**
