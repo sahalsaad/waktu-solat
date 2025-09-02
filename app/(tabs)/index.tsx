@@ -5,8 +5,7 @@ import { useToastController } from '@tamagui/toast'
 import { PrayerTimeService } from '../../services/prayerService'
 import { PrayerResponse, Zone, MALAYSIAN_ZONES, MAIN_PRAYER_TIMES } from '../../types/prayer'
 import { getCurrentPrayer, getNextPrayerCountdown } from '../../utils/prayerUtils'
-import { DateHeader } from '../../components/prayer/DateHeader'
-import { NextPrayerCountdown } from '../../components/prayer/NextPrayerCountdown'
+import { CombinedHeader } from '../../components/prayer/CombinedHeader'
 import { PrayerTimeCard } from '../../components/prayer/PrayerTimeCard'
 import { QiblaDirection } from '../../components/prayer/QiblaDirection'
 import { ZoneSelector } from '../../components/prayer/ZoneSelector'
@@ -95,16 +94,12 @@ export default function PrayerTimesScreen() {
             onZoneChange={setSelectedZone}
           />
           
-          {/* Date Header */}
-          <DateHeader
+          {/* Combined Date Header and Next Prayer Countdown */}
+          <CombinedHeader
             hijriDate={todayPrayer.hijri}
             gregorianDate={todayPrayer.date}
             zoneName={selectedZone.name}
             day={todayPrayer.day}
-          />
-          
-          {/* Next Prayer Countdown */}
-          <NextPrayerCountdown
             nextPrayer={nextPrayer}
             timeLeft={timeLeft}
             currentPrayer={current}
