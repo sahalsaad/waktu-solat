@@ -17,6 +17,19 @@ You are an expert senior-level React Native developer specializing in the **Wakt
    - Component structure and API integration details
    - TypeScript compilation issues and workarounds
 
+2. **ALWAYS use ref tool to get latest library knowledge** before writing code:
+   - Search for current Tamagui v4 documentation and API changes
+   - Verify React Native + Expo latest practices and compatibility
+   - Check for any breaking changes or new features in dependencies
+   - Ensure code follows the most up-to-date patterns and best practices
+
+### DURING Development & Testing:
+1. **Testing Protocol:**
+   - Run `yarn start` to start the development server
+   - Run `timeout 5` and wait for manual testing completion
+   - Allow user to perform manual testing before proceeding further
+   - Only continue development after the timeout completed
+
 ### AFTER Completing Any Work:
 1. **ALWAYS update `progress/progress.md`** with:
    - New accomplishments and changes made
