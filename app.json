@@ -51,7 +51,22 @@
       "typedRoutes": true
     },
     "description": "Aplikasi waktu solat rasmi untuk Malaysia dengan data dari JAKIM. Dapatkan maklumat waktu solat yang tepat mengikut zon di seluruh Malaysia.",
-    "keywords": ["prayer", "solat", "islam", "malaysia", "jakim", "waktu", "kiblat", "qibla"],
-    "primaryColor": "#1793d1"
+    "keywords": [
+      "prayer",
+      "solat",
+      "islam",
+      "malaysia",
+      "jakim",
+      "waktu",
+      "kiblat",
+      "qibla"
+    ],
+    "primaryColor": "#1793d1",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "009e11ed-4878-4756-aee7-a80ebeb89d49"
+      }
+    }
   }
 }
