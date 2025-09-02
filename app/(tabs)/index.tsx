@@ -105,61 +105,75 @@ export default function PrayerTimesScreen() {
             currentPrayer={current}
           />
           
-          {/* Prayer Times */}
-          <YStack marginTop="$4">
-            <Text
-              fontSize="$5"
-              fontWeight="600"
-              color="#f0f6fc"
-              marginBottom="$3"
-            >
-              Waktu Solat
-            </Text>
-            
-            {MAIN_PRAYER_TIMES.map((prayer) => {
-              const time = todayPrayer[prayer.key]
-              const isNext = nextPrayer === prayer.name
-              const isCurrent = current === prayer.name
-              
-              return (
-                <PrayerTimeCard
-                  key={prayer.key}
-                  prayer={prayer}
-                  time={time}
-                  isNext={isNext}
-                  isCurrent={isCurrent}
-                />
-              )
-            })}
-          </YStack>
+          {/* All Prayer Times in API Order */}
+          {/* Imsak */}
+          <PrayerTimeCard
+            prayer={{ key: 'imsak', name: 'Imsak', nameArabic: 'إمساك' }}
+            time={todayPrayer.imsak}
+            isAdditional={true}
+          />
+          
+          {/* Fajr (Subuh) */}
+          <PrayerTimeCard
+            prayer={{ key: 'fajr', name: 'Subuh', nameArabic: 'فجر' }}
+            time={todayPrayer.fajr}
+            isNext={nextPrayer === 'Subuh'}
+            isCurrent={current === 'Subuh'}
+            isAdditional={false}
+          />
+          
+          {/* Syuruk */}
+          <PrayerTimeCard
+            prayer={{ key: 'syuruk', name: 'Syuruk', nameArabic: 'شروق' }}
+            time={todayPrayer.syuruk}
+            isAdditional={true}
+          />
+          
+          {/* Dhuha */}
+          <PrayerTimeCard
+            prayer={{ key: 'dhuha', name: 'Dhuha', nameArabic: 'ضحى' }}
+            time={todayPrayer.dhuha}
+            isAdditional={true}
+          />
+          
+          {/* Dhuhr (Zohor) */}
+          <PrayerTimeCard
+            prayer={{ key: 'dhuhr', name: 'Zohor', nameArabic: 'ظهر' }}
+            time={todayPrayer.dhuhr}
+            isNext={nextPrayer === 'Zohor'}
+            isCurrent={current === 'Zohor'}
+            isAdditional={false}
+          />
+          
+          {/* Asr (Asar) */}
+          <PrayerTimeCard
+            prayer={{ key: 'asr', name: 'Asar', nameArabic: 'عصر' }}
+            time={todayPrayer.asr}
+            isNext={nextPrayer === 'Asar'}
+            isCurrent={current === 'Asar'}
+            isAdditional={false}
+          />
+          
+          {/* Maghrib */}
+          <PrayerTimeCard
+            prayer={{ key: 'maghrib', name: 'Maghrib', nameArabic: 'مغرب' }}
+            time={todayPrayer.maghrib}
+            isNext={nextPrayer === 'Maghrib'}
+            isCurrent={current === 'Maghrib'}
+            isAdditional={false}
+          />
+          
+          {/* Isha (Isyak) */}
+          <PrayerTimeCard
+            prayer={{ key: 'isha', name: 'Isyak', nameArabic: 'عشاء' }}
+            time={todayPrayer.isha}
+            isNext={nextPrayer === 'Isyak'}
+            isCurrent={current === 'Isyak'}
+            isAdditional={false}
+          />
           
           {/* Qibla Direction */}
           <QiblaDirection bearing={prayerData.bearing} />
-          
-          {/* Additional Prayer Times */}
-          <YStack marginTop="$4">
-            <Text
-              fontSize="$4"
-              fontWeight="600"
-              color="#8b949e"
-              marginBottom="$3"
-            >
-              Waktu Tambahan
-            </Text>
-            
-            <PrayerTimeCard
-              prayer={{ key: 'imsak', name: 'Imsak', nameArabic: 'إمساك' }}
-              time={todayPrayer.imsak}
-            />
-            <PrayerTimeCard
-              prayer={{ key: 'syuruk', name: 'Syuruk', nameArabic: 'شروق' }}
-              time={todayPrayer.syuruk}
-            />
-            <PrayerTimeCard
-              prayer={{ key: 'dhuha', name: 'Dhuha', nameArabic: 'ضحى' }}
-              time={todayPrayer.dhuha}
-            />
-          </YStack>
         </YStack>
       </ScrollView>
     </YStack>

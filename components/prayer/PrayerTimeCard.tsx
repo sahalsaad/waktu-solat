@@ -8,14 +8,21 @@ interface PrayerTimeCardProps {
   time: string
   isNext?: boolean
   isCurrent?: boolean
+  isAdditional?: boolean // New prop to differentiate prayer types
 }
 
-export function PrayerTimeCard({ prayer, time, isNext, isCurrent }: PrayerTimeCardProps) {
+export function PrayerTimeCard({ prayer, time, isNext, isCurrent, isAdditional = false }: PrayerTimeCardProps) {
+  // Determine left border color based on prayer type
+  const leftBorderColor = isAdditional ? '$archAccent' : '$archPrimary'
+  const leftBorderWidth = isNext ? 4 : (isAdditional ? 3 : 2)
+  
   return (
     <Card
       backgroundColor={isCurrent ? '$archSurface' : '$archBackground'}
       borderColor={isNext ? '$archPrimary' : '$archBorder'}
-      borderWidth={isNext ? 2 : 1}
+      borderWidth={1}
+      borderLeftWidth={leftBorderWidth}
+      borderLeftColor={leftBorderColor}
       padding="$4"
       marginVertical="$2"
       borderRadius="$4"
