@@ -4,7 +4,7 @@ import { YStack, XStack, ScrollView, Text, Button, Spinner, H2 } from 'tamagui'
 import { Settings } from '@tamagui/lucide-icons'
 import { useToastController } from '@tamagui/toast'
 import { PrayerTimeService } from '../services/prayerService'
-import { PrayerResponse, Zone, MALAYSIAN_ZONES, MAIN_PRAYER_TIMES } from '../types/prayer'
+import { PrayerResponse, PrayerTime, Zone, MALAYSIAN_ZONES, MAIN_PRAYER_TIMES } from '../types/prayer'
 import { getCurrentPrayer, getNextPrayerCountdown } from '../utils/prayerUtils'
 import { CombinedHeader } from '../components/prayer/CombinedHeader'
 import { PrayerTimeCard } from '../components/prayer/PrayerTimeCard'
@@ -14,20 +14,47 @@ import { SettingsSheet } from '../components/prayer/SettingsSheet'
 import { usePrayerPreferences } from '../contexts/PrayerPreferencesContext'
 
 export default function PrayerTimesScreen() {
-  const [prayerData, setPrayerData] = useState<PrayerResponse | null>(null)
-  const [selectedZone, setSelectedZone] = useState<Zone>(MALAYSIAN_ZONES[0]) // Default to KL
+  const [monthlyPrayerData, setMonthlyPrayerData] = useState<PrayerResponse | null>(null)
+  const [todayPrayer, setTodayPrayer] = useState<PrayerTime | null>(null)
+  const [selectedZone, setSelectedZone] = useState<Zone>(MALAYSIAN_ZONES[0]) // Default to first zone (JHR01)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [cacheStatus, setCacheStatus] = useState<'loading' | 'cached' | 'fresh'>('loading')
   const { preferences } = usePrayerPreferences()
   const toast = useToastController()
   
-  const fetchPrayerTimes = async (showLoading = true) => {
+  const fetchPrayerTimes = async (showLoading = true, forceRefresh = false) => {
     try {
       if (showLoading) setLoading(true)
-      const data = await PrayerTimeService.fetchPrayerTimes(selectedZone.code)
-      setPrayerData(data)
+      setCacheStatus('loading')
+      
+      // Use force refresh or regular fetch
+      const data = forceRefresh 
+        ? await PrayerTimeService.refreshPrayerTimes(selectedZone.code)
+        : await PrayerTimeService.fetchPrayerTimes(selectedZone.code)
+      
+      setMonthlyPrayerData(data)
+      
+      // Extract today's prayer time from monthly data
+      const todayData = PrayerTimeService.getTodayPrayerTime(data)
+      if (todayData) {
+        setTodayPrayer(todayData)
+        setCacheStatus(forceRefresh ? 'fresh' : 'cached')
+      } else {
+        throw new Error('Tidak dapat mencari waktu solat untuk hari ini')
+      }
+      
+      // Show cache status in toast (only for manual refresh)
+      if (refreshing) {
+        toast.show(forceRefresh ? 'Data Fresh' : 'Data Cached', {
+          message: forceRefresh 
+            ? 'Data waktu solat telah dikemaskinikan dari server' 
+            : 'Menggunakan data tersimpan untuk bulan ini',
+        })
+      }
     } catch (error) {
+      setCacheStatus('loading')
       toast.show('Ralat', {
         message: error instanceof Error ? error.message : 'Gagal memuat waktu solat',
       })
@@ -39,9 +66,11 @@ export default function PrayerTimesScreen() {
   
   const onRefresh = () => {
     setRefreshing(true)
-    fetchPrayerTimes(false)
+    // For manual refresh, force fetch fresh data to ensure latest updates
+    fetchPrayerTimes(false, true)
   }
   
+  // Initial load and zone change
   useEffect(() => {
     fetchPrayerTimes()
   }, [selectedZone])
@@ -49,29 +78,40 @@ export default function PrayerTimesScreen() {
   // Auto-refresh countdown every minute
   useEffect(() => {
     const interval = setInterval(() => {
-      if (prayerData) {
-        // Force re-render to update countdown
-        setPrayerData({ ...prayerData })
+      if (todayPrayer && monthlyPrayerData) {
+        // Re-extract today's data in case day changed
+        const updatedTodayData = PrayerTimeService.getTodayPrayerTime(monthlyPrayerData)
+        if (updatedTodayData) {
+          setTodayPrayer(updatedTodayData)
+        }
       }
     }, 60000) // Update every minute
     
     return () => clearInterval(interval)
-  }, [prayerData])
+  }, [todayPrayer, monthlyPrayerData])
   
-  if (loading && !prayerData) {
+  if (loading && !todayPrayer) {
     return (
       <YStack flex={1} alignItems="center" justifyContent="center" backgroundColor="#0d1117">
         <Spinner size="large" color="#1793d1" />
-        <Text fontSize="$4" color="#f0f6fc" marginTop="$4">Memuat waktu solat...</Text>
+        <Text fontSize="$4" color="#f0f6fc" marginTop="$4">
+          {cacheStatus === 'loading' ? 'Memuat waktu solat...' : 'Menyediakan data...'}
+        </Text>
+        <Text fontSize="$2" color="#8b949e" marginTop="$2">
+          {selectedZone.name}
+        </Text>
       </YStack>
     )
   }
   
-  if (!prayerData) {
+  if (!todayPrayer || !monthlyPrayerData) {
     return (
       <YStack flex={1} alignItems="center" justifyContent="center" backgroundColor="#0d1117" padding="$4">
         <Text fontSize="$5" color="#f0f6fc" textAlign="center" marginBottom="$4">
           Gagal memuat waktu solat
+        </Text>
+        <Text fontSize="$3" color="#8b949e" textAlign="center" marginBottom="$4">
+          Pastikan sambungan internet aktif
         </Text>
         <Button onPress={() => fetchPrayerTimes()} backgroundColor="#1793d1">
           <Text color="#0d1117">Cuba Lagi</Text>
@@ -80,7 +120,6 @@ export default function PrayerTimesScreen() {
     )
   }
   
-  const todayPrayer = prayerData.prayerTime[0]
   const { current, next } = getCurrentPrayer(todayPrayer)
   const { timeLeft, nextPrayer } = getNextPrayerCountdown(todayPrayer)
   
@@ -101,14 +140,22 @@ export default function PrayerTimesScreen() {
         <YStack width={40} />
         
         {/* Centered Title */}
-        <H2 
-          fontSize="$6" 
-          fontWeight="bold" 
-          color="#f0f6fc"
-          textAlign="center"
-        >
-          Waktu Solat
-        </H2>
+        <YStack alignItems="center">
+          <H2 
+            fontSize="$6" 
+            fontWeight="bold" 
+            color="#f0f6fc"
+            textAlign="center"
+          >
+            Waktu Solat
+          </H2>
+          {/* Cache status indicator */}
+          {cacheStatus !== 'loading' && (
+            <Text fontSize="$1" color="#8b949e">
+              {cacheStatus === 'cached' ? '💾 Data tersimpan' : '🔄 Data terkini'}
+            </Text>
+          )}
+        </YStack>
         
         {/* Settings Button */}
         <Button
@@ -126,7 +173,13 @@ export default function PrayerTimesScreen() {
       <ScrollView
         flex={1}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh}
+            tintColor="#1793d1"
+            title="Menarik untuk menyegerkan..."
+            titleColor="#8b949e"
+          />
         }
       >
         <YStack padding="$4">
@@ -221,7 +274,24 @@ export default function PrayerTimesScreen() {
           />
           
           {/* Qibla Direction */}
-          <QiblaDirection bearing={prayerData.bearing} />
+          <QiblaDirection bearing={monthlyPrayerData.bearing} />
+          
+          {/* Monthly data info */}
+          <YStack 
+            marginTop="$4" 
+            padding="$3" 
+            backgroundColor="#161b22" 
+            borderRadius="$4"
+            borderWidth={1}
+            borderColor="#30363d"
+          >
+            <Text fontSize="$2" color="#8b949e" textAlign="center">
+              📅 Data untuk bulan ini ({monthlyPrayerData.prayerTime.length} hari)
+            </Text>
+            <Text fontSize="$1" color="#6e7681" textAlign="center" marginTop="$1">
+              Tarik ke bawah untuk menyegerkan data terkini
+            </Text>
+          </YStack>
         </YStack>
       </ScrollView>
 
