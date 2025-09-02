@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card, Text, XStack, YStack, Circle } from 'tamagui'
 import { PrayerName } from '../../types/prayer'
-import { formatTime } from '../../utils/prayerUtils'
+import { formatTime12Hour } from '../../utils/prayerUtils'
 
 interface PrayerTimeCardProps {
   prayer: PrayerName
@@ -63,7 +63,7 @@ export function PrayerTimeCard({ prayer, time, isNext, isCurrent, isAdditional =
           fontWeight="bold"
           color={isNext ? '$archPrimary' : '$archText'}
         >
-          {formatTime(time)}
+          {formatTime12Hour(time)}
         </Text>
       </XStack>
     </Card>

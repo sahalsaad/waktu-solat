@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Zone, MALAYSIAN_ZONES } from '../types/prayer'
 
 interface PrayerPreferences {
   // Notification settings
@@ -10,6 +11,9 @@ interface PrayerPreferences {
   showImsak: boolean
   showSyuruk: boolean
   showDhuha: boolean
+  
+  // Zone selection
+  selectedZone: Zone
 }
 
 interface PrayerPreferencesContextType {
@@ -24,6 +28,7 @@ const defaultPreferences: PrayerPreferences = {
   showImsak: true,
   showSyuruk: true,
   showDhuha: true,
+  selectedZone: MALAYSIAN_ZONES[0], // Default to first zone (JHR01)
 }
 
 const PrayerPreferencesContext = createContext<PrayerPreferencesContextType | undefined>(undefined)
@@ -54,13 +59,15 @@ export function PrayerPreferencesProvider({ children }: { children: React.ReactN
   }
 
   const updatePreferences = async (newPreferences: Partial<PrayerPreferences>) => {
-    try {
-      const updatedPreferences = { ...preferences, ...newPreferences }
-      setPreferences(updatedPreferences)
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPreferences))
-    } catch (error) {
+    // Immediately update state for responsive UI
+    const updatedPreferences = { ...preferences, ...newPreferences }
+    setPreferences(updatedPreferences)
+    
+    // Save to storage asynchronously without awaiting
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPreferences)).catch(error => {
       console.error('Failed to save prayer preferences:', error)
-    }
+      // Optionally: revert state on error
+    })
   }
 
   return (

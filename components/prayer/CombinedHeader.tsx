@@ -1,7 +1,8 @@
 import React from 'react'
 import { Card, Text, XStack, YStack } from 'tamagui'
-import { Calendar, MapPin, Clock } from '@tamagui/lucide-icons'
-import { formatHijriDate } from '../../utils/prayerUtils'
+import { Calendar, Clock } from '@tamagui/lucide-icons'
+import { formatHijriDate, formatTime12Hour } from '../../utils/prayerUtils'
+import { TEXTS } from '../../constants/texts'
 
 interface CombinedHeaderProps {
   hijriDate: string
@@ -73,129 +74,94 @@ export function CombinedHeader({
       shadowRadius={4}
       elevation={2}
     >
-      <YStack gap="$4">
-        {/* Date Section */}
-        <XStack gap="$3">
-          {/* Left Border Indicator */}
-          <YStack
-            width={4}
-            backgroundColor="$archAccent"
-            borderRadius="$2"
-            flex={0}
-            minHeight={60}
-          />
-          
-          <YStack flex={1} gap="$2">
-            <XStack gap="$2">
-              <Calendar size="$1" color="$archAccent" />
-              <Text
-                fontSize="$4"
-                fontWeight="600"
-                color="$archText"
-              >
-                {day}
-              </Text>
-            </XStack>
-            
+      <XStack gap="$4" alignItems="flex-start">
+        {/* Date Section - Left Side */}
+        <YStack flex={1} gap="$2">
+          <XStack gap="$2">
+            <Calendar size="$1" color="$archAccent" />
             <Text
-              fontSize="$3"
+              fontSize="$4"
+              fontWeight="600"
               color="$archText"
             >
-              {formatGregorianDate(gregorianDate)}
+              {day}
             </Text>
-            
-            <Text
-              fontSize="$2"
-              color="$archTextSecondary"
-            >
-              {formatHijriDate(hijriDate)}
-            </Text>
-            
-            <XStack gap="$2">
-              <MapPin size="$0.75" color="$archTextSecondary" />
-              <Text
-                fontSize="$2"
-                color="$archTextSecondary"
-              >
-                {zoneName}
-              </Text>
-            </XStack>
-          </YStack>
-        </XStack>
+          </XStack>
+          
+          <Text
+            fontSize="$3"
+            color="$archText"
+          >
+            {formatGregorianDate(gregorianDate)}
+          </Text>
+          
+          <Text
+            fontSize="$2"
+            color="$archTextSecondary"
+          >
+            {formatHijriDate(hijriDate)}
+          </Text>
+        </YStack>
         
-        {/* Divider */}
+        {/* Vertical Divider */}
         <YStack 
-          height={1} 
+          width={1} 
           backgroundColor="$archBorder" 
           opacity={0.3} 
+          minHeight={80}
         />
         
-        {/* Next Prayer Section */}
-        <XStack gap="$3">
-          {/* Left Border Indicator */}
-          <YStack
-            width={4}
-            backgroundColor="$archPrimary"
-            borderRadius="$2"
-            flex={0}
-            minHeight={60}
-          />
-          
-          <YStack flex={1} gap="$2">
-            <XStack gap="$2">
-              <Clock size="$1" color="$archPrimary" />
-              <Text
-                fontSize="$3"
-                color="$archTextSecondary"
-                textTransform="uppercase"
-              >
-                Waktu Solat Seterusnya
-              </Text>
-            </XStack>
-            
-            <XStack gap="$3" flexWrap="wrap">
-              <Text
-                fontSize="$6"
-                fontWeight="bold"
-                color="$archPrimary"
-              >
-                {nextPrayer}
-              </Text>
-              
-              <XStack gap="$2">
-                <YStack
-                  width={8}
-                  height={8}
-                  backgroundColor="$archAccent"
-                  borderRadius={4}
-                  alignSelf="center"
-                />
-                <Text
-                  fontSize="$5"
-                  fontWeight="600"
-                  color="$archText"
-                >
-                  {timeLeft}
-                </Text>
-                <YStack
-                  width={8}
-                  height={8}
-                  backgroundColor="$archAccent"
-                  borderRadius={4}
-                  alignSelf="center"
-                />
-              </XStack>
-            </XStack>
-            
+        {/* Next Prayer Section - Right Side */}
+        <YStack flex={1} gap="$2">
+          <XStack gap="$2">
+            <Clock size="$1" color="$archPrimary" />
             <Text
-              fontSize="$2"
-              color="$archTextMuted"
+              fontSize="$3"
+              color="$archTextSecondary"
+              textTransform="uppercase"
             >
-              Sekarang: {currentPrayer}
+              {TEXTS.header.nextPrayer}
             </Text>
-          </YStack>
-        </XStack>
-      </YStack>
+          </XStack>
+          
+          <Text
+            fontSize="$5"
+            fontWeight="bold"
+            color="$archPrimary"
+          >
+            {nextPrayer}
+          </Text>
+          
+          <XStack gap="$2" alignItems="center">
+            <YStack
+              width={6}
+              height={6}
+              backgroundColor="$archAccent"
+              borderRadius={3}
+            />
+            <Text
+              fontSize="$4"
+              fontWeight="600"
+              color="$archText"
+            >
+              {timeLeft}
+            </Text>
+            <YStack
+              width={6}
+              height={6}
+              backgroundColor="$archAccent"
+              borderRadius={3}
+            />
+          </XStack>
+          
+          <Text
+            fontSize="$2"
+            color="$archTextMuted"
+          >
+            {TEXTS.header.currentPrayer}: {currentPrayer}
+          </Text>
+        </YStack>
+      </XStack>
     </Card>
   )
 }

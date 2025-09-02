@@ -12,17 +12,23 @@ import { QiblaDirection } from '../components/prayer/QiblaDirection'
 import { ZoneSelector } from '../components/prayer/ZoneSelector'
 import { SettingsSheet } from '../components/prayer/SettingsSheet'
 import { usePrayerPreferences } from '../contexts/PrayerPreferencesContext'
+import { TEXTS } from '../constants/texts'
 
 export default function PrayerTimesScreen() {
   const [monthlyPrayerData, setMonthlyPrayerData] = useState<PrayerResponse | null>(null)
   const [todayPrayer, setTodayPrayer] = useState<PrayerTime | null>(null)
-  const [selectedZone, setSelectedZone] = useState<Zone>(MALAYSIAN_ZONES[0]) // Default to first zone (JHR01)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
-  const { preferences } = usePrayerPreferences()
+  const { preferences, updatePreferences, loading: preferencesLoading } = usePrayerPreferences()
   const toast = useToastController()
+  
+  const selectedZone = preferences.selectedZone
+  
+  const handleZoneChange = async (zone: Zone) => {
+    await updatePreferences({ selectedZone: zone })
+  }
   
   const fetchPrayerTimes = async (showLoading = true, forceRefresh = false) => {
     try {
@@ -60,8 +66,11 @@ export default function PrayerTimesScreen() {
   
   // Initial load and zone change
   useEffect(() => {
-    fetchPrayerTimes()
-  }, [selectedZone])
+    // Only fetch when preferences are loaded and we have a zone
+    if (!preferencesLoading && selectedZone) {
+      fetchPrayerTimes()
+    }
+  }, [selectedZone, preferencesLoading])
   
   // Auto-refresh countdown every minute
   useEffect(() => {
@@ -83,7 +92,7 @@ export default function PrayerTimesScreen() {
       <YStack flex={1} alignItems="center" justifyContent="center" backgroundColor="#0d1117">
         <Spinner size="large" color="#1793d1" />
         <Text fontSize="$4" color="#f0f6fc" marginTop="$4">
-          Memuat waktu solat...
+          {TEXTS.loading.prayerTimes}
         </Text>
         <Text fontSize="$2" color="#8b949e" marginTop="$2">
           {selectedZone.name}
@@ -135,7 +144,7 @@ export default function PrayerTimesScreen() {
             color="#f0f6fc"
             textAlign="center"
           >
-            Waktu Solat
+            {TEXTS.appTitle}
           </H2>
         </YStack>
         
@@ -168,7 +177,7 @@ export default function PrayerTimesScreen() {
           {/* Zone Selector */}
           <ZoneSelector
             selectedZone={selectedZone}
-            onZoneChange={setSelectedZone}
+            onZoneChange={handleZoneChange}
           />
           
           {/* Combined Date Header and Next Prayer Countdown */}
@@ -186,7 +195,7 @@ export default function PrayerTimesScreen() {
           {/* Imsak - Optional */}
           {preferences.showImsak && (
             <PrayerTimeCard
-              prayer={{ key: 'imsak', name: 'Imsak', nameArabic: 'إمساك' }}
+              prayer={{ key: 'imsak', name: TEXTS.prayers.imsak, nameArabic: 'إمساك' }}
               time={todayPrayer.imsak}
               isAdditional={true}
             />
@@ -194,17 +203,17 @@ export default function PrayerTimesScreen() {
           
           {/* Fajr (Subuh) - Always shown */}
           <PrayerTimeCard
-            prayer={{ key: 'fajr', name: 'Subuh', nameArabic: 'فجر' }}
+            prayer={{ key: 'fajr', name: TEXTS.prayers.subuh, nameArabic: 'فجر' }}
             time={todayPrayer.fajr}
-            isNext={nextPrayer === 'Subuh'}
-            isCurrent={current === 'Subuh'}
+            isNext={nextPrayer === TEXTS.prayers.subuh}
+            isCurrent={current === TEXTS.prayers.subuh}
             isAdditional={false}
           />
           
           {/* Syuruk - Optional */}
           {preferences.showSyuruk && (
             <PrayerTimeCard
-              prayer={{ key: 'syuruk', name: 'Syuruk', nameArabic: 'شروق' }}
+              prayer={{ key: 'syuruk', name: TEXTS.prayers.syuruk, nameArabic: 'شروق' }}
               time={todayPrayer.syuruk}
               isAdditional={true}
             />
@@ -213,7 +222,7 @@ export default function PrayerTimesScreen() {
           {/* Dhuha - Optional */}
           {preferences.showDhuha && (
             <PrayerTimeCard
-              prayer={{ key: 'dhuha', name: 'Dhuha', nameArabic: 'ضحى' }}
+              prayer={{ key: 'dhuha', name: TEXTS.prayers.dhuha, nameArabic: 'ضحى' }}
               time={todayPrayer.dhuha}
               isAdditional={true}
             />
@@ -221,37 +230,37 @@ export default function PrayerTimesScreen() {
           
           {/* Dhuhr (Zohor) - Always shown */}
           <PrayerTimeCard
-            prayer={{ key: 'dhuhr', name: 'Zohor', nameArabic: 'ظهر' }}
+            prayer={{ key: 'dhuhr', name: TEXTS.prayers.zohor, nameArabic: 'ظهر' }}
             time={todayPrayer.dhuhr}
-            isNext={nextPrayer === 'Zohor'}
-            isCurrent={current === 'Zohor'}
+            isNext={nextPrayer === TEXTS.prayers.zohor}
+            isCurrent={current === TEXTS.prayers.zohor}
             isAdditional={false}
           />
           
           {/* Asr (Asar) - Always shown */}
           <PrayerTimeCard
-            prayer={{ key: 'asr', name: 'Asar', nameArabic: 'عصر' }}
+            prayer={{ key: 'asr', name: TEXTS.prayers.asar, nameArabic: 'عصر' }}
             time={todayPrayer.asr}
-            isNext={nextPrayer === 'Asar'}
-            isCurrent={current === 'Asar'}
+            isNext={nextPrayer === TEXTS.prayers.asar}
+            isCurrent={current === TEXTS.prayers.asar}
             isAdditional={false}
           />
           
           {/* Maghrib - Always shown */}
           <PrayerTimeCard
-            prayer={{ key: 'maghrib', name: 'Maghrib', nameArabic: 'مغرب' }}
+            prayer={{ key: 'maghrib', name: TEXTS.prayers.maghrib, nameArabic: 'مغرب' }}
             time={todayPrayer.maghrib}
-            isNext={nextPrayer === 'Maghrib'}
-            isCurrent={current === 'Maghrib'}
+            isNext={nextPrayer === TEXTS.prayers.maghrib}
+            isCurrent={current === TEXTS.prayers.maghrib}
             isAdditional={false}
           />
           
           {/* Isha (Isyak) - Always shown */}
           <PrayerTimeCard
-            prayer={{ key: 'isha', name: 'Isyak', nameArabic: 'عشاء' }}
+            prayer={{ key: 'isha', name: TEXTS.prayers.isyak, nameArabic: 'عشاء' }}
             time={todayPrayer.isha}
-            isNext={nextPrayer === 'Isyak'}
-            isCurrent={current === 'Isyak'}
+            isNext={nextPrayer === TEXTS.prayers.isyak}
+            isCurrent={current === TEXTS.prayers.isyak}
             isAdditional={false}
           />
           

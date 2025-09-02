@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Button, Text, XStack, YStack, Sheet, Input, H4 } from 'tamagui'
 import { MapPin, Search, X } from '@tamagui/lucide-icons'
 import { Zone, MALAYSIAN_ZONES } from '../../types/prayer'
+import { TEXTS } from '../../constants/texts'
 
 interface ZoneSelectorProps {
   selectedZone: Zone
@@ -41,32 +42,34 @@ export function ZoneSelector({ selectedZone, onZoneChange }: ZoneSelectorProps) 
         backgroundColor="$archSurface"
         borderColor="$archBorder"
         borderWidth={1}
-        padding="$3"
+        padding="$4"
         onPress={() => setSheetOpen(true)}
         borderRadius="$4"
         pressStyle={{ backgroundColor: '#30363d' }}
+        height="auto"
+        minHeight={70}
       >
-        <XStack alignItems="center" justifyContent="space-between" flex={1}>
-          <XStack alignItems="center" gap="$2">
-            <MapPin size="$1" color="$archPrimary" />
-            <YStack>
-              <Text
-                fontSize="$4"
-                fontWeight="600"
-                color="$archText"
-              >
-                {selectedZone.name}
-              </Text>
-              <Text
-                fontSize="$2"
-                color="$archTextSecondary"
-              >
-                {selectedZone.state} ({selectedZone.code})
-              </Text>
-            </YStack>
-          </XStack>
-          
-          <Text fontSize="$3" color="$archTextSecondary">Tukar</Text>
+        <XStack alignItems="center" gap="$3" flex={1}>
+          <MapPin size="$1.5" color="$archPrimary" />
+          <YStack flex={1} gap="$1">
+            <Text
+              fontSize="$4"
+              fontWeight="600"
+              color="$archText"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {selectedZone.name}
+            </Text>
+            <Text
+              fontSize="$2"
+              color="$archTextSecondary"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {selectedZone.state} ({selectedZone.code})
+            </Text>
+          </YStack>
         </XStack>
       </Button>
 
@@ -89,7 +92,7 @@ export function ZoneSelector({ selectedZone, onZoneChange }: ZoneSelectorProps) 
             {/* Header */}
             <XStack alignItems="center" justifyContent="space-between" marginBottom="$3">
               <H4 color="$archText" fontWeight="600">
-                Pilih Zon Waktu Solat
+                {TEXTS.zoneSelector.selectZone}
               </H4>
               <Button
                 size="$3"
@@ -107,7 +110,7 @@ export function ZoneSelector({ selectedZone, onZoneChange }: ZoneSelectorProps) 
             <XStack alignItems="center" gap="$2" marginBottom="$4">
               <YStack flex={1}>
                 <Input
-                  placeholder="Cari negeri, daerah atau kod zon..."
+                  placeholder={TEXTS.zoneSelector.searchPlaceholder}
                   value={searchQuery}
                   onChangeText={setSearchQuery}
                   backgroundColor="$archBackground"
@@ -123,23 +126,23 @@ export function ZoneSelector({ selectedZone, onZoneChange }: ZoneSelectorProps) 
 
             {/* Results Count */}
             <Text fontSize="$2" color="$archTextSecondary" marginBottom="$3">
-              {filteredZones.length} zon dijumpai
+              {filteredZones.length} {TEXTS.zoneSelector.zonesFound}
             </Text>
 
             {/* Zone List */}
             <Sheet.ScrollView flex={1} showsVerticalScrollIndicator={false}>
-              <YStack gap="$3">
+              <YStack gap="$4">
                 {Object.entries(groupedFilteredZones).map(([state, zones]) => (
                   <YStack key={state} gap="$2">
                     {/* State Header */}
                     <Text
-                      fontSize="$3"
+                      fontSize="$4"
                       fontWeight="600"
                       color="$archPrimary"
-                      paddingHorizontal="$3"
-                      paddingVertical="$2"
+                      paddingHorizontal="$4"
+                      paddingVertical="$3"
                       backgroundColor="$archBackground"
-                      borderRadius="$2"
+                      borderRadius="$3"
                     >
                       {state}
                     </Text>
@@ -153,33 +156,40 @@ export function ZoneSelector({ selectedZone, onZoneChange }: ZoneSelectorProps) 
                         borderWidth={1}
                         onPress={() => handleZoneSelect(zone)}
                         justifyContent="flex-start"
-                        paddingHorizontal="$3"
-                        paddingVertical="$3"
+                        paddingHorizontal="$4"
+                        paddingVertical="$4"
                         borderRadius="$3"
+                        height="auto"
+                        minHeight={60}
                         pressStyle={{ 
                           backgroundColor: selectedZone.code === zone.code ? '$archPrimary' : '#30363d' 
                         }}
                       >
-                        <YStack alignItems="flex-start" flex={1}>
-                          <Text
-                            fontSize="$3"
-                            color={selectedZone.code === zone.code ? '$archBackground' : '$archText'}
-                            fontWeight={selectedZone.code === zone.code ? '600' : '500'}
-                          >
-                            {zone.name}
-                          </Text>
-                          <Text
-                            fontSize="$2"
-                            color={selectedZone.code === zone.code ? '$archBackground' : '$archTextSecondary'}
-                          >
-                            {zone.code}
-                          </Text>
-                        </YStack>
-                        
-                        {/* Selection Indicator */}
-                        {selectedZone.code === zone.code && (
-                          <Text fontSize="$4" color="$archBackground">✓</Text>
-                        )}
+                        <XStack alignItems="center" justifyContent="space-between" flex={1}>
+                          <YStack alignItems="flex-start" flex={1}>
+                            <Text
+                              fontSize="$4"
+                              color={selectedZone.code === zone.code ? '$archBackground' : '$archText'}
+                              fontWeight={selectedZone.code === zone.code ? '600' : '500'}
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                            >
+                              {zone.name}
+                            </Text>
+                            <Text
+                              fontSize="$3"
+                              color={selectedZone.code === zone.code ? '$archBackground' : '$archTextSecondary'}
+                              marginTop="$1"
+                            >
+                              {zone.code}
+                            </Text>
+                          </YStack>
+                          
+                          {/* Selection Indicator */}
+                          {selectedZone.code === zone.code && (
+                            <Text fontSize="$5" color="$archBackground" marginLeft="$2">✓</Text>
+                          )}
+                        </XStack>
                       </Button>
                     ))}
                   </YStack>
@@ -189,10 +199,10 @@ export function ZoneSelector({ selectedZone, onZoneChange }: ZoneSelectorProps) 
                 {filteredZones.length === 0 && (
                   <YStack alignItems="center" padding="$4">
                     <Text fontSize="$4" color="$archTextSecondary" textAlign="center">
-                      Tiada zon dijumpai
+                      {TEXTS.zoneSelector.noZonesFound}
                     </Text>
                     <Text fontSize="$2" color="$archTextSecondary" textAlign="center" marginTop="$2">
-                      Cuba cari dengan nama negeri, daerah atau kod zon
+                      {TEXTS.zoneSelector.searchHint}
                     </Text>
                   </YStack>
                 )}

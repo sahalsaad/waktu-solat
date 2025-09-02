@@ -71,6 +71,27 @@ export function formatTime(timeString: string): string {
   return `${hours}:${minutes}`
 }
 
+export function formatTime12Hour(timeString: string): string {
+  const [hours, minutes] = timeString.split(':').map(Number)
+  
+  // Convert to 12-hour format
+  let hour12 = hours
+  let period = 'AM'
+  
+  if (hours === 0) {
+    hour12 = 12
+    period = 'AM'
+  } else if (hours === 12) {
+    hour12 = 12
+    period = 'PM'
+  } else if (hours > 12) {
+    hour12 = hours - 12
+    period = 'PM'
+  }
+  
+  return `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`
+}
+
 export function formatHijriDate(hijriString: string): string {
   // Convert "1447-03-09" to a more readable format
   const [year, month, day] = hijriString.split('-')

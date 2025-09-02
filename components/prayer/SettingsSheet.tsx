@@ -1,110 +1,117 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { YStack, XStack, Text, Switch, Card, Button, Sheet, H2 } from 'tamagui'
-import { Bell, Volume2, Smartphone, Clock, Info, Moon, X } from '@tamagui/lucide-icons'
+import { Bell, Clock, Moon, X } from '@tamagui/lucide-icons'
 import { usePrayerPreferences } from '../../contexts/PrayerPreferencesContext'
-
-interface SettingItem {
-  icon: React.ReactNode | null
-  title: string
-  description: string
-  value?: boolean
-  onToggle?: (value: boolean) => void
-  showValue?: string
-}
+import { TEXTS } from '../../constants/texts'
 
 interface SettingsSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
+interface SettingItemProps {
+  icon: React.ReactNode | null
+  title: string
+  description: string
+  value: boolean
+  onToggle: (value: boolean) => void
+  uniqueKey: string
+}
+
+// Memoized SettingCard component to prevent unnecessary re-renders
+const SettingCard = memo(({ icon, title, description, value, onToggle, uniqueKey }: SettingItemProps) => (
+  <Card
+    backgroundColor="#161b22"
+    borderColor="#30363d"
+    borderWidth={1}
+    padding="$4"
+    marginVertical="$2"
+    borderRadius="$4"
+    minHeight={70}
+  >
+    <XStack alignItems="center" justifyContent="space-between">
+      <XStack alignItems="center" gap="$3" flex={1}>
+        {icon}
+        <YStack flex={1}>
+          <Text
+            fontSize="$4"
+            fontWeight="600"
+            color="#f0f6fc"
+          >
+            {title}
+          </Text>
+          <Text
+            fontSize="$3"
+            color="#8b949e"
+            marginTop="$1"
+          >
+            {description}
+          </Text>
+        </YStack>
+      </XStack>
+      
+      <Switch
+        checked={value}
+        onCheckedChange={onToggle}
+        size="$4"
+        style={{
+          backgroundColor: value ? '#1793d1' : '#30363d'
+        }}
+      >
+        <Switch.Thumb backgroundColor="#ffffff" />
+      </Switch>
+    </XStack>
+  </Card>
+))
+
 export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
   const { preferences, updatePreferences } = usePrayerPreferences()
 
-  const notificationSettings: SettingItem[] = [
+  const notificationSettings = [
     {
       icon: <Bell color="#1793d1" size={20} />,
-      title: 'Notifikasi Waktu Solat',
-      description: 'Terima pemberitahuan ketika masuk waktu solat',
+      title: TEXTS.settings.prayerNotification,
+      description: TEXTS.settings.prayerNotificationDesc,
       value: preferences.notifications,
-      onToggle: (value) => updatePreferences({ notifications: value }),
+      onToggle: (value: boolean) => updatePreferences({ notifications: value }),
+      uniqueKey: 'notifications',
     },
     {
       icon: <Clock color="#f78166" size={20} />,
-      title: 'Peringatan Awal',
-      description: 'Notifikasi 15 minit sebelum waktu solat',
+      title: TEXTS.settings.earlyNotification,
+      description: TEXTS.settings.earlyNotificationDesc,
       value: preferences.earlyNotification,
-      onToggle: (value) => updatePreferences({ earlyNotification: value }),
+      onToggle: (value: boolean) => updatePreferences({ earlyNotification: value }),
+      uniqueKey: 'earlyNotification',
     },
   ]
 
-  const prayerDisplaySettings: SettingItem[] = [
+  const prayerDisplaySettings = [
     {
       icon: null,
-      title: 'Tampilkan Imsak',
-      description: 'Paparkan waktu Imsak dalam senarai',
+      title: TEXTS.settings.showImsak,
+      description: TEXTS.settings.showImsakDesc,
       value: preferences.showImsak,
-      onToggle: (value) => updatePreferences({ showImsak: value }),
+      onToggle: (value: boolean) => updatePreferences({ showImsak: value }),
+      uniqueKey: 'showImsak',
     },
     {
       icon: null,
-      title: 'Tampilkan Syuruk',
-      description: 'Paparkan waktu Syuruk dalam senarai',
+      title: TEXTS.settings.showSyuruk,
+      description: TEXTS.settings.showSyurukDesc,
       value: preferences.showSyuruk,
-      onToggle: (value) => updatePreferences({ showSyuruk: value }),
+      onToggle: (value: boolean) => updatePreferences({ showSyuruk: value }),
+      uniqueKey: 'showSyuruk',
     },
     {
       icon: null,
-      title: 'Tampilkan Dhuha',
-      description: 'Paparkan waktu Dhuha dalam senarai',
+      title: TEXTS.settings.showDhuha,
+      description: TEXTS.settings.showDhuhaDesc,
       value: preferences.showDhuha,
-      onToggle: (value) => updatePreferences({ showDhuha: value }),
+      onToggle: (value: boolean) => updatePreferences({ showDhuha: value }),
+      uniqueKey: 'showDhuha',
     },
   ]
-
-  const SettingCard = ({ icon, title, description, value, onToggle, showValue }: SettingItem) => (
-    <Card
-      backgroundColor="#161b22"
-      borderColor="#30363d"
-      borderWidth={1}
-      padding="$4"
-      marginVertical="$2"
-      borderRadius="$4"
-    >
-      <XStack alignItems="center" justifyContent="space-between">
-        <XStack alignItems="center" gap="$3" flex={1}>
-          {icon && icon}
-          <YStack flex={1} marginLeft={icon ? 0 : "$2"}>
-            <Text
-              fontSize="$4"
-              fontWeight="600"
-              color="#f0f6fc"
-            >
-              {title}
-            </Text>
-            <Text
-              fontSize="$3"
-              color="#8b949e"
-              marginTop="$1"
-            >
-              {description}
-            </Text>
-          </YStack>
-        </XStack>
-        
-        {onToggle && value !== undefined ? (
-          <Switch
-            checked={value}
-            onCheckedChange={onToggle}
-            backgroundColor={value ? '#1793d1' : '#30363d'}
-          />
-        ) : showValue ? (
-          <Text fontSize="$3" color="#8b949e">
-            {showValue}
-          </Text>
-        ) : null}
-      </XStack>
-    </Card>
-  )
 
   return (
     <Sheet
@@ -130,7 +137,7 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
           {/* Header */}
           <XStack alignItems="center" justifyContent="space-between" padding="$4" borderBottomWidth={1} borderBottomColor="#30363d">
             <H2 color="#f0f6fc" fontSize="$6" fontWeight="bold">
-              Tetapan
+              {TEXTS.settings.title}
             </H2>
             <Button
               size="$3"
@@ -154,7 +161,7 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
                 fontSize="$3"
                 color="#8b949e"
               >
-                Sesuaikan aplikasi mengikut keutamaan anda
+                {TEXTS.settings.subtitle}
               </Text>
 
               {/* Notification Settings */}
@@ -165,11 +172,11 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
                   color="#1793d1"
                   marginBottom="$2"
                 >
-                  Notifikasi
+                  {TEXTS.settings.notificationSection}
                 </Text>
                 
                 {notificationSettings.map((setting, index) => (
-                  <SettingCard key={index} {...setting} />
+                  <SettingCard key={setting.uniqueKey} {...setting} />
                 ))}
               </YStack>
 
@@ -181,7 +188,7 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
                   color="#f78166"
                   marginBottom="$2"
                 >
-                  Waktu Solat Tambahan
+                  {TEXTS.settings.additionalPrayersSection}
                 </Text>
                 <Text
                   fontSize="$3"
@@ -189,68 +196,12 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
                   marginBottom="$2"
                   lineHeight={18}
                 >
-                  Pilih waktu solat tambahan yang ingin dipaparkan. Waktu solat utama (Subuh, Zohor, Asar, Maghrib, Isyak) akan sentiasa ditunjukkan.
+                  {TEXTS.settings.additionalPrayersDesc}
                 </Text>
                 
                 {prayerDisplaySettings.map((setting, index) => (
-                  <SettingCard key={index} {...setting} />
+                  <SettingCard key={setting.uniqueKey} {...setting} />
                 ))}
-              </YStack>
-
-              {/* App Information */}
-              <YStack gap="$3" marginTop="$4">
-                <Text
-                  fontSize="$4"
-                  fontWeight="600"
-                  color="#1793d1"
-                  marginBottom="$2"
-                >
-                  Maklumat Aplikasi
-                </Text>
-                
-                <SettingCard
-                  icon={<Info color="#8b949e" size={20} />}
-                  title="Versi Aplikasi"
-                  description="Waktu Solat Malaysia"
-                  showValue="1.0.0"
-                />
-                
-                <Card
-                  backgroundColor="#161b22"
-                  borderColor="#30363d"
-                  borderWidth={1}
-                  padding="$4"
-                  marginVertical="$2"
-                  borderRadius="$4"
-                >
-                  <YStack gap="$2">
-                    <Text
-                      fontSize="$4"
-                      fontWeight="600"
-                      color="#f0f6fc"
-                    >
-                      Tentang Aplikasi
-                    </Text>
-                    <Text
-                      fontSize="$3"
-                      color="#8b949e"
-                      lineHeight={20}
-                    >
-                      Aplikasi Waktu Solat Malaysia menggunakan data rasmi dari 
-                      JAKIM (e-solat.gov.my) untuk memberikan maklumat waktu solat 
-                      yang tepat mengikut zon di seluruh Malaysia.
-                    </Text>
-                    <Text
-                      fontSize="$3"
-                      color="#8b949e"
-                      lineHeight={20}
-                      marginTop="$2"
-                    >
-                      Dibangunkan dengan React Native dan Tamagui untuk 
-                      pengalaman pengguna yang moden dan responsif.
-                    </Text>
-                  </YStack>
-                </Card>
               </YStack>
 
               {/* Theme Info */}
@@ -261,7 +212,7 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
                   color="#1793d1"
                   marginBottom="$2"
                 >
-                  Tema
+                  {TEXTS.settings.themeSection}
                 </Text>
                 
                 <Card
@@ -279,13 +230,7 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
                         fontWeight="600"
                         color="#f0f6fc"
                       >
-                        Tema Gelap
-                      </Text>
-                      <Text
-                        fontSize="$3"
-                        color="#8b949e"
-                      >
-                        Diilhamkan oleh Arch Linux - minimalis dan profesional
+                        {TEXTS.settings.darkTheme}
                       </Text>
                     </YStack>
                   </XStack>
