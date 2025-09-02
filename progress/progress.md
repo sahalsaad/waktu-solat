@@ -9,6 +9,52 @@
 
 ## Recent Session Accomplishments
 
+### 🎯 **Main Task Completed: UI Architecture Redesign - Tab to Header/Sheet Layout**
+
+#### Problem Identified:
+- User didn't like the tab layout for settings
+- Wanted a more streamlined single-screen interface
+- Requested centered "Waktu Solat" title with settings button in header
+- Preferred modal sheet for settings instead of separate tab
+
+#### Solution Implemented:
+
+1. **Removed Tab Navigation System**
+   - Deleted `app/(tabs)/` directory and tab layout structure
+   - Updated root layout (`app/_layout.tsx`) to use simple stack navigation
+   - Changed initial route from `(tabs)` to `index`
+
+2. **Created Custom Header with Settings**
+   - File: `app/index.tsx` (moved from `app/(tabs)/index.tsx`)
+   - Added custom header with:
+     - Centered "Waktu Solat" title
+     - Settings button (gear icon) on the right
+     - Proper spacing using left spacer for center alignment
+     - Arch Linux theme colors (#161b22 background, #30363d borders)
+
+3. **Implemented Settings Sheet Component**
+   - File: `components/prayer/SettingsSheet.tsx`
+   - Modal sheet that slides up from bottom
+   - Contains all previous settings functionality:
+     - Notification toggles
+     - Sound and vibration settings
+     - App information and about section
+     - Theme information
+   - Features:
+     - 90% screen height coverage
+     - Dismissible with overlay tap or handle drag
+     - Close button in header
+     - Scroll support for content
+     - Proper visual feedback and animations
+
+4. **Enhanced User Experience**
+   - Maintained all existing prayer time functionality
+   - Single screen approach with more focus on prayer times
+   - Settings accessible but not taking screen real estate
+   - Clean, minimalist interface aligned with Islamic app principles
+
+## Previous Session Accomplishments
+
 ### 🎯 **Main Task Completed: UI Space Optimization & Component Combination**
 
 #### Problem Identified:
@@ -61,30 +107,44 @@
 - **API Service:** Custom prayer time service
 - **Icons:** Lucide React Native icons
 
-### 🎨 **Design System**
+### 🎨 **Design System Updates**
 **Theme Configuration** (`tamagui.config.ts`):
-- **Primary Colors:**
+- **Primary Colors:** Maintained existing Arch Linux inspired palette
   - `$archPrimary`: #1793d1 (Arch Linux blue)
   - `$archAccent`: #f78166 (Coral accent)
-  - `$archSurface`: Dark surface colors
-  - `$archText`: Light text on dark background
-- **Dark Mode:** Default theme with Arch Linux inspired palette
+  - `$archSurface`: Dark surface colors (#161b22)
+  - `$archText`: Light text on dark background (#f0f6fc)
+- **Navigation:** Removed tab bar, added custom header
+- **Modal Design:** Sheet component with proper overlay and animations
 
-### 📁 **Project Structure**
+**New Header Design:**
+- Fixed header with dark background (#161b22)
+- Centered "Waktu Solat" title using spacer technique
+- Settings gear icon button on right side
+- Border bottom for visual separation from content
+- Consistent with overall dark theme
+
+**Settings Sheet Design:**
+- Modal sheet covering 90% of screen height
+- Drag handle for easy dismissal
+- Close button (X) in sheet header
+- Scrollable content with proper padding
+- Semi-transparent overlay (rgba(0,0,0,0.5))
+- All settings organized in cards with icons and toggles
+
+### 📁 **Updated Project Structure**
 ```
 app/
-├── (tabs)/
-│   ├── index.tsx          # Main prayer times screen
-│   ├── two.tsx           # Secondary tab
-│   └── _layout.tsx       # Tab layout
-├── _layout.tsx           # Root layout
-├── modal.tsx            # Modal screens
+├── index.tsx             # MOVED: Main prayer times screen (from (tabs)/index.tsx)
+├── _layout.tsx           # UPDATED: Simple stack navigation (removed tabs)
+├── modal.tsx            # Existing modal screens
 └── +not-found.tsx       # 404 page
 
 components/
 ├── prayer/
-│   ├── CombinedHeader.tsx     # NEW: Combined date + countdown
-│   ├── PrayerTimeCard.tsx     # ENHANCED: Added isAdditional prop
+│   ├── SettingsSheet.tsx     # NEW: Modal sheet for settings
+│   ├── CombinedHeader.tsx     # Combined date + countdown
+│   ├── PrayerTimeCard.tsx     # Enhanced with isAdditional prop
 │   ├── QiblaDirection.tsx     # Qibla compass
 │   └── ZoneSelector.tsx       # Location selector
 ├── Provider.tsx         # App providers
@@ -243,8 +303,22 @@ const formatGregorianDate = (dateString: string): string => {
 
 ## Session Summary
 
-**Duration:** ~2 hours  
-**Primary Focus:** UI optimization and component consolidation  
-**Result:** Successfully combined prayer time components while maintaining functionality and improving visual organization through color-coded left borders. The app now displays all prayer times in the correct API order with clear visual differentiation between main and additional prayers.
+**Duration:** ~1 hour  
+**Primary Focus:** UI architecture redesign from tab navigation to header/sheet layout  
+**Result:** Successfully transformed the app from a tab-based navigation to a single-screen interface with a custom header containing centered title and settings button. Settings now appear in a modern modal sheet instead of a separate tab, providing better focus on prayer times while maintaining full settings functionality.
+
+**User Experience Improvements:**
+- ✅ Streamlined single-screen interface focused on prayer times
+- ✅ Centered "Waktu Solat" title in custom header  
+- ✅ Settings accessible via gear icon button on header right
+- ✅ Modern modal sheet for settings with smooth animations
+- ✅ Maintained all existing functionality while improving accessibility
+- ✅ Better visual hierarchy with header separation from content
 
 **Next Session Priorities:** Address TypeScript issues, add testing, and consider additional user experience enhancements.
+
+---
+
+## Previous Sessions
+
+### Session Summary (Space Optimization)

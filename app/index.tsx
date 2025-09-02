@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import { RefreshControl } from 'react-native'
-import { YStack, ScrollView, Text, Button, Spinner } from 'tamagui'
+import { YStack, XStack, ScrollView, Text, Button, Spinner, H2 } from 'tamagui'
+import { Settings } from '@tamagui/lucide-icons'
 import { useToastController } from '@tamagui/toast'
-import { PrayerTimeService } from '../../services/prayerService'
-import { PrayerResponse, Zone, MALAYSIAN_ZONES, MAIN_PRAYER_TIMES } from '../../types/prayer'
-import { getCurrentPrayer, getNextPrayerCountdown } from '../../utils/prayerUtils'
-import { CombinedHeader } from '../../components/prayer/CombinedHeader'
-import { PrayerTimeCard } from '../../components/prayer/PrayerTimeCard'
-import { QiblaDirection } from '../../components/prayer/QiblaDirection'
-import { ZoneSelector } from '../../components/prayer/ZoneSelector'
+import { PrayerTimeService } from '../services/prayerService'
+import { PrayerResponse, Zone, MALAYSIAN_ZONES, MAIN_PRAYER_TIMES } from '../types/prayer'
+import { getCurrentPrayer, getNextPrayerCountdown } from '../utils/prayerUtils'
+import { CombinedHeader } from '../components/prayer/CombinedHeader'
+import { PrayerTimeCard } from '../components/prayer/PrayerTimeCard'
+import { QiblaDirection } from '../components/prayer/QiblaDirection'
+import { ZoneSelector } from '../components/prayer/ZoneSelector'
+import { SettingsSheet } from '../components/prayer/SettingsSheet'
 
 export default function PrayerTimesScreen() {
   const [prayerData, setPrayerData] = useState<PrayerResponse | null>(null)
   const [selectedZone, setSelectedZone] = useState<Zone>(MALAYSIAN_ZONES[0]) // Default to KL
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const toast = useToastController()
   
   const fetchPrayerTimes = async (showLoading = true) => {
@@ -81,6 +84,43 @@ export default function PrayerTimesScreen() {
   
   return (
     <YStack flex={1} backgroundColor="#0d1117">
+      {/* Header */}
+      <XStack
+        alignItems="center"
+        justifyContent="space-between"
+        paddingHorizontal="$4"
+        paddingTop="$8"
+        paddingBottom="$4"
+        backgroundColor="#161b22"
+        borderBottomWidth={1}
+        borderBottomColor="#30363d"
+      >
+        {/* Left spacer to center the title */}
+        <YStack width={40} />
+        
+        {/* Centered Title */}
+        <H2 
+          fontSize="$6" 
+          fontWeight="bold" 
+          color="#f0f6fc"
+          textAlign="center"
+        >
+          Waktu Solat
+        </H2>
+        
+        {/* Settings Button */}
+        <Button
+          size="$3"
+          circular
+          chromeless
+          onPress={() => setSettingsOpen(true)}
+          backgroundColor="transparent"
+          pressStyle={{ backgroundColor: '#30363d' }}
+        >
+          <Settings color="#8b949e" size={20} />
+        </Button>
+      </XStack>
+
       <ScrollView
         flex={1}
         refreshControl={
@@ -176,6 +216,9 @@ export default function PrayerTimesScreen() {
           <QiblaDirection bearing={prayerData.bearing} />
         </YStack>
       </ScrollView>
+
+      {/* Settings Sheet */}
+      <SettingsSheet open={settingsOpen} onOpenChange={setSettingsOpen} />
     </YStack>
   )
 }
