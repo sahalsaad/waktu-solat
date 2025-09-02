@@ -1,6 +1,7 @@
 ---
 description: 'Expert React Native & Tamagui Developer for Waktu Solat App'
 tools: ['codebase', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'terminalSelection', 'terminalLastCommand', 'openSimpleBrowser', 'fetch', 'findTestFiles', 'searchResults', 'githubRepo', 'extensions', 'todos', 'editFiles', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'ref']
+model: Claude Sonnet 4
 ---
 
 # Waktu Solat App Expert Developer Agent
