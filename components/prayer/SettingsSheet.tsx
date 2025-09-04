@@ -65,7 +65,7 @@ const SettingCard = memo(({ icon, title, description, value, onToggle, uniqueKey
 ))
 
 export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
-  const { preferences, updatePreferences, lastError, clearPreferences, debugAsyncStorage } = usePrayerPreferences()
+  const { preferences, updatePreferences, lastError, clearPreferences, debugStorage } = usePrayerPreferences()
 
   const notificationSettings = [
     {
@@ -155,6 +155,9 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
             flex={1}
             contentContainerStyle={{ flexGrow: 1 }}
             showsVerticalScrollIndicator={false}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+            scrollEventThrottle={16}
           >
             <YStack padding="$4" gap="$4">
               <Text
@@ -270,7 +273,7 @@ export function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
                     backgroundColor="#30363d"
                     borderColor="#f78166"
                     borderWidth={1}
-                    onPress={debugAsyncStorage}
+                    onPress={debugStorage}
                     icon={<Bug color="#f78166" size={16} />}
                   >
                     <Text color="#f78166" fontSize="$3">

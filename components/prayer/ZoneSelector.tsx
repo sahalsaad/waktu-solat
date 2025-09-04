@@ -130,7 +130,13 @@ export function ZoneSelector({ selectedZone, onZoneChange }: ZoneSelectorProps) 
             </Text>
 
             {/* Zone List */}
-            <Sheet.ScrollView flex={1} showsVerticalScrollIndicator={false}>
+            <Sheet.ScrollView 
+              flex={1} 
+              showsVerticalScrollIndicator={false}
+              keyboardDismissMode="on-drag"
+              keyboardShouldPersistTaps="handled"
+              scrollEventThrottle={16}
+            >
               <YStack gap="$4">
                 {Object.entries(groupedFilteredZones).map(([state, zones]) => (
                   <YStack key={state} gap="$2">

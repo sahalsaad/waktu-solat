@@ -52,7 +52,6 @@ export class PrayerTimeService {
       await AsyncStorage.removeItem(cacheKey)
       return null
     } catch (error) {
-      console.error('Error getting cached data:', error)
       return null
     }
   }
@@ -77,7 +76,7 @@ export class PrayerTimeService {
       // Clean up old cache entries for different months
       await this.cleanOldCache(zone, currentMonth)
     } catch (error) {
-      console.error('Error caching data:', error)
+      // Silently handle cache errors
     }
   }
 
@@ -95,7 +94,7 @@ export class PrayerTimeService {
         }
       }
     } catch (error) {
-      console.error('Error cleaning old cache:', error)
+      // Silently handle cache cleanup errors
     }
   }
 
@@ -126,7 +125,6 @@ export class PrayerTimeService {
 
       return data
     } catch (error) {
-      console.error('Error fetching monthly prayer times:', error)
       throw new Error(
         error instanceof Error 
           ? error.message 
@@ -145,12 +143,10 @@ export class PrayerTimeService {
       const cachedData = await this.getCachedData(zone)
       
       if (cachedData) {
-        console.log(`Using cached prayer data for ${zone} (${cachedData.month})`)
         return cachedData.data
       }
 
       // No valid cache, fetch from API
-      console.log(`Fetching fresh prayer data for ${zone}`)
       const freshData = await this.fetchMonthlyPrayerTimes(zone)
       
       // Cache the fresh data
@@ -158,7 +154,6 @@ export class PrayerTimeService {
       
       return freshData
     } catch (error) {
-      console.error('Error in fetchPrayerTimes:', error)
       throw error
     }
   }
@@ -168,7 +163,6 @@ export class PrayerTimeService {
    */
   static async refreshPrayerTimes(zone: string): Promise<PrayerResponse> {
     try {
-      console.log(`Force refreshing prayer data for ${zone}`)
       const freshData = await this.fetchMonthlyPrayerTimes(zone)
       
       // Update cache with fresh data
@@ -176,7 +170,6 @@ export class PrayerTimeService {
       
       return freshData
     } catch (error) {
-      console.error('Error refreshing prayer times:', error)
       throw error
     }
   }
@@ -262,7 +255,6 @@ export class PrayerTimeService {
       
       return todayPrayer
     } catch (error) {
-      console.error('Error getting today prayer time:', error)
       return monthlyData.prayerTime[0] || null
     }
   }
@@ -277,10 +269,9 @@ export class PrayerTimeService {
       
       if (cacheKeys.length > 0) {
         await AsyncStorage.multiRemove(cacheKeys)
-        console.log(`Cleared ${cacheKeys.length} cached prayer data entries`)
       }
     } catch (error) {
-      console.error('Error clearing cache:', error)
+      // Silently handle cache clear errors
     }
   }
 

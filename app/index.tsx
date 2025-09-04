@@ -163,6 +163,10 @@ export default function PrayerTimesScreen() {
 
       <ScrollView
         flex={1}
+        showsVerticalScrollIndicator={false}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
+        scrollEventThrottle={16}
         refreshControl={
           <RefreshControl 
             refreshing={refreshing} 
